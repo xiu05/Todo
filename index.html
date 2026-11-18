@@ -1664,9 +1664,9 @@ async function wander(c){
     const u = CATS[0]; await walkTo(c, u.x + (u.dir > 0 ? -58 : 58), u.y); setPose(c, 'sleep'); return 12000;
   }
   if (nightIdle()) { setPose(c, 'sleep'); return 12000; }
-  if (r < .5) { await walkTo(c, b.x0 + Math.random() * (b.x1 - b.x0), b.y1); setPose(c, 'sit'); return 2500 + Math.random() * 3000; }
-  if (r < .62) { await walkTo(c, c.x < innerWidth / 2 ? b.x1 : b.x0, b.y1, 150); setPose(c, 'sit'); catSpeak(c, 'zoomies!'); return 3000; }   // zoomies across the whole screen
-  if (r < .74 && !c.friend) { const x = b.x0 + Math.random() * (b.x1 - b.x0), y = b.y0 + Math.random() * (b.y1 - b.y0) * .7; await walkTo(c, x, y, 70); setPose(c, 'sit'); catSpeak(c, 'nice view up here'); await delay(2600); await walkTo(c, x, b.y1, 90); setPose(c, 'sit'); return 3000; }
+  if (r < .6) { await walkTo(c, b.x0 + Math.random() * (b.x1 - b.x0), b.y1); setPose(c, 'sit'); return 2500 + Math.random() * 3000; }
+  if (r < .7) { await walkTo(c, c.x < innerWidth / 2 ? b.x1 : b.x0, b.y1, 150); setPose(c, 'sit'); catSpeak(c, 'zoomies!'); return 3000; }   // zoomies across the whole screen
+  if (r < .8 && !c.friend) { const x = b.x0 + Math.random() * (b.x1 - b.x0), y = b.y0 + Math.random() * (b.y1 - b.y0) * .7; await walkTo(c, x, y, 70); setPose(c, 'sit'); catSpeak(c, 'nice view up here'); await delay(2600); await walkTo(c, x, b.y1, 90); setPose(c, 'sit'); return 3000; }
   setPose(c, 'sit'); if (r < .85) catSpeak(c, c.friend ? pick(['mew?', '*yawn*', 'prrp']) : petLine()); return 4500 + Math.random() * 3500;
 }
 async function tickCat(c){
