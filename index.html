@@ -288,6 +288,20 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 .madd .cta{margin-left:auto;margin-top:4px}
 .mlnk{display:inline-block;margin-top:8px;color:var(--muted);border-bottom:1px solid transparent} .mlnk:hover{color:var(--ink);border-color:var(--ink)}
 
+/* ---------- sync ---------- */
+#syncBtn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);color:var(--muted);text-align:center;font-size:15px;transition:.15s;position:relative}
+#syncBtn:hover{border-color:var(--ink);color:var(--ink)}
+#syncBtn.ok{color:var(--green);border-color:var(--green)} #syncBtn.bad{color:var(--red);border-color:var(--red)} #syncBtn.busy{animation:pulse 1.2s ease-in-out infinite}
+#sync{position:fixed;top:64px;right:18px;z-index:67;width:310px;background:var(--card);border:2px solid var(--ink);border-radius:20px;box-shadow:var(--shadow);padding:16px 16px 14px;animation:drop .2s ease}
+#sync[hidden]{display:none}
+#sync h4{margin:0 0 6px;font:900 20px var(--disp);letter-spacing:-.03em}
+#sync p{margin:0 0 10px;color:var(--muted);font:500 12px/1.6 var(--mono);text-transform:none;letter-spacing:.01em}
+#sync input{width:100%;border:0;border-bottom:2px solid var(--ink);background:none;outline:0;padding:8px 2px;font:600 15px var(--mono);margin-bottom:10px}
+#sync .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#sync .msg{color:var(--red);font:500 12px/1.5 var(--mono);margin:0 0 8px}
+#sync .ok{color:var(--green)}
+#sync .x{position:absolute;right:12px;top:12px;opacity:1;color:var(--muted)}
+
 /* ---------- pet cat ---------- */
 #petToggle{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);color:var(--muted);text-align:center;font-size:15px;filter:grayscale(1);opacity:.7;transition:.15s}
 #petToggle.on{border-color:var(--ink);filter:none;opacity:1}
@@ -475,7 +489,8 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   .ptool .st span{display:inline} .ptool .st{padding:3px 10px}
   .nbForm input{font-size:46px}
   .cday{min-height:54px;padding:4px} .cchips{display:none} .cdots{display:flex}
-  #petToggle,#themeBtn{display:none} .fset{display:flex}
+  #petToggle,#themeBtn,#syncBtn{display:none} .fset{display:flex}
+  #sync{top:60px;right:12px;left:12px;width:auto}
   #petCard{left:12px!important;bottom:80px}
   #fab{right:14px;bottom:14px} #qa{right:12px;bottom:70px} #musicBtn{left:14px;bottom:14px} #timerPill{left:74px;bottom:22px} #tpName{display:none} #music{left:12px;bottom:74px}
   #toast{bottom:76px}
@@ -491,7 +506,7 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   <nav class="nav">
     <button id="logo" title="psst… pet me" aria-label="Purrgress"></button>
     <div class="tabs"><button data-tab="brands">Brands</button><button data-tab="calendar">Calendar</button><button data-tab="deadlines">Deadlines</button></div>
-    <span id="saved" class="mono" role="status"></span><span id="clock" class="mono"></span><button id="petToggle" aria-label="Show or hide your pet cat" title="Pet cat on/off">🐾</button><button id="themeBtn" aria-label="Switch light/dark theme"></button>
+    <span id="saved" class="mono" role="status"></span><span id="clock" class="mono"></span><button id="syncBtn" aria-label="Sync across devices" title="Sync across devices">☁</button><button id="petToggle" aria-label="Show or hide your pet cat" title="Pet cat on/off">🐾</button><button id="themeBtn" aria-label="Switch light/dark theme"></button>
   </nav>
 
   <div id="stage">
@@ -502,7 +517,7 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   </div>
 
   <section id="card" class="card"></section>
-  <footer class="mono"><div class="fset"><button id="themeBtn2" type="button"></button><button id="petToggle2" type="button"></button></div>Press N for a quick task · tap a task to edit or comment · saved on this device 🐾</footer>
+  <footer class="mono"><div class="fset"><button id="themeBtn2" type="button"></button><button id="petToggle2" type="button"></button><button id="syncBtn2" type="button">☁ Sync</button></div>Press N for a quick task · tap a task to edit or comment · saved on this device 🐾</footer>
 </div>
 <div id="bubble"></div>
 
@@ -548,6 +563,7 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   </div>
   <div class="dfoot mono"><span id="created"></span><span class="dbtn"><button id="dDel">Delete</button><button id="dSave" class="cta">Save</button></span></div>
 </aside>
+<div id="sync" hidden role="dialog" aria-label="Sync across devices"></div>
 <div id="petCard" hidden role="dialog" aria-label="Your pet cat">
   <div class="pc-h" id="pcHead"></div>
   <div class="pc-st mono" id="pcSt"></div>
@@ -675,11 +691,16 @@ S.pomoSet = Object.assign({on:false, f:25, b:5, l:15, every:4}, S.pomoSet || {})
 if (S.timer && !S.projects.some(p => p.id === S.timer.pid)) S.timer = null;
 if (S.brand !== '+' && !S.brands.some(b => b.id === S.brand)) S.brand = S.brands[0]?.id || '+';
 S.adding = false; S.edit = null;
+let SYNC = {pass:'', at:0, dirty:false};
+try { Object.assign(SYNC, JSON.parse(localStorage.getItem('purrgress.sync')) || {}); } catch(e){}
+SYNC.status = SYNC.pass ? 'syncing' : 'off'; SYNC.applying = false; SYNC.conflict = null; SYNC.msg = '';
+const saveSync = () => { try { const {status, applying, conflict, msg, ...rest} = SYNC; localStorage.setItem('purrgress.sync', JSON.stringify(rest)); } catch(e){} };
 let saveOK = true, savedT;
 function save(){
   const {adding, edit, ...rest} = S, j = JSON.stringify(rest);
   try { localStorage.setItem(KEY, j); saveOK = localStorage.getItem(KEY) === j; } catch(e){ saveOK = false; }
   if (!saveOK) { try { window.name = 'purrgress:' + j; } catch(e){} } // last-resort: survives reloads of this tab
+  if (!SYNC.applying) onSaved();
   const el = $('#saved'); if (!el) return;
   el.className = 'mono' + (saveOK ? ' ok' : ' bad');
   el.textContent = saveOK ? 'Saved ✓' : '⚠ Not saved — open in a normal tab';
@@ -1551,6 +1572,7 @@ addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (cal) return closeCal();
     if (qaOpen) return closeQA();
+    if (!$('#sync').hidden) return openSync(false);
     if (!$('#petCard').hidden) return closePetCard();
     if (openId) return tryCloseDrawer();
     return;
@@ -1878,6 +1900,122 @@ addEventListener('resize', () => CATS.forEach(c => { if (c.placed) place(c, c.x,
 mkCat(false); mkCat(true); applyPet();
 if (S.pet.on && S.pet.friend.on && !S.pet.friend.seen) setTimeout(() => { S.pet.friend.seen = true; save(); catSpeak(CATS[1], `hi! I’m ${S.pet.friend.name} 🧡`, 4500); }, 1500);
 if (S.pet.on && !S.pet.name && !S.pet.asked) setTimeout(() => { if (S.pet.on && !S.pet.name) { S.pet.asked = true; save(); openPetCard('pet'); petSay('hi! what should you call me? 😺', 6000); } }, 1800);
+
+/* ---------- cross-device sync (Vercel /api/state → Upstash Redis) ---------- */
+const SYNC_KEYS = ['brands', 'projects', 'tasks', 'music', 'pet', 'timer', 'pomoSet'];
+const syncPayload = () => { const o = {}; SYNC_KEYS.forEach(k => o[k] = S[k]); return JSON.parse(JSON.stringify(o)); };
+async function syncApi(method, body, meta){
+  const r = await fetch('/api/state' + (meta ? '?meta=1' : ''), {method, cache:'no-store', headers:{'x-passcode':SYNC.pass, ...(body ? {'Content-Type':'application/json'} : {})}, body:body ? JSON.stringify(body) : undefined});
+  let data = null; try { data = await r.json(); } catch(e){}
+  return {status:r.status, data};
+}
+function setSyncStatus(st, msg = ''){
+  SYNC.status = st; SYNC.msg = msg;
+  const label = {off:'☁', ok:'☁', syncing:'⟳', pending:'⟳', offline:'⚠', error:'⚠', conflict:'⚠'}[st] || '☁';
+  const cls = st === 'ok' ? 'ok' : (st === 'error' || st === 'conflict' || st === 'offline') ? 'bad' : (st === 'syncing' || st === 'pending') ? 'busy' : '';
+  const b = $('#syncBtn'); b.textContent = label; b.className = cls;
+  $('#syncBtn2').textContent = `${label} Sync${st === 'ok' ? 'ed' : ''}`;
+  if (!$('#sync').hidden) renderSync();
+}
+let syncPushT = 0;
+function onSaved(){
+  if (!SYNC.pass) return;
+  if (SYNC.hash && JSON.stringify(syncPayload()) === SYNC.hash) return; // only real data changes sync (not which tab you're on)
+  SYNC.dirty = true; saveSync();
+  if (SYNC.conflict) return;
+  clearTimeout(syncPushT); syncPushT = setTimeout(() => syncPush(), 1500); setSyncStatus('pending');
+}
+async function syncPush(force){
+  if (!SYNC.pass) return; setSyncStatus('syncing');
+  try {
+    const r = await syncApi('PUT', {state:syncPayload(), baseAt:SYNC.at, force:!!force});
+    if (r.status === 200) { SYNC.at = r.data.updatedAt; SYNC.dirty = false; SYNC.hash = JSON.stringify(syncPayload()); saveSync(); setSyncStatus('ok'); SYNC.lastAt = Date.now(); }
+    else if (r.status === 409) { SYNC.conflict = {remote:r.data, kind:'diverged'}; setSyncStatus('conflict'); openSync(true); }
+    else if (r.status === 401) setSyncStatus('error', 'Wrong passcode');
+    else if (r.status === 413) setSyncStatus('error', 'Your data is too large to sync (limit ≈ 900 KB)');
+    else setSyncStatus('error', `Server error (${r.status})`);
+  } catch(e){ setSyncStatus('offline', 'Offline — will retry'); }
+}
+function fixupRemote(){
+  S.tasks = S.tasks || []; S.projects = S.projects || []; S.brands = S.brands || [];
+  S.tasks.forEach(t => { t.comments = t.comments || []; t.created = t.created || Date.now(); t.status = t.status || (t.done ? 'done' : 'todo'); t.done = t.status === 'done'; });
+  S.projects.forEach(p => { p.due = p.due || ''; p.sessions = p.sessions || []; p.status = p.status || 'todo'; });
+  S.music = S.music || {tracks:[], idx:0};
+  S.pet = Object.assign({on:true, name:'', love:30, treats:0, done:0, seeded:true, asked:true}, S.pet || {});
+  S.pet.friend = Object.assign({on:true, name:'Pudding', seen:true}, S.pet.friend || {});
+  S.pomoSet = Object.assign({on:false, f:25, b:5, l:15, every:4}, S.pomoSet || {});
+  if (S.timer && !projOf(S.timer.pid)) S.timer = null;
+  if (S.brand !== '+' && !S.brands.some(b => b.id === S.brand)) S.brand = S.brands[0]?.id || '+';
+  if (S.open && !projOf(S.open)) S.open = null;
+}
+function applyRemote(doc){
+  SYNC.applying = true;
+  const keep = {tab:S.tab, brand:S.brand, open:S.open, cal:S.cal, tlog:S.tlog, theme:S.theme};
+  S = {...keep, ...doc.state}; S.adding = false; S.edit = null; fixupRemote(); save();
+  SYNC.applying = false; SYNC.at = doc.updatedAt; SYNC.dirty = false; SYNC.hash = JSON.stringify(syncPayload()); saveSync();
+  if (openId && !task(openId)) closeDrawer();
+  render(); applyPet(); tickTimer(); setSyncStatus('ok'); SYNC.lastAt = Date.now();
+}
+async function syncPull(initial){
+  if (!SYNC.pass || SYNC.conflict) return;
+  try {
+    const m = await syncApi('GET', null, true);
+    if (m.status === 401) return setSyncStatus('error', 'Wrong passcode');
+    if (m.status === 501) return setSyncStatus('error', 'The server isn’t set up for sync yet (see README)');
+    if (m.status === 404 || m.status === 405) return setSyncStatus('error', 'No sync server here — open your deployed Vercel site');
+    if (m.status !== 200 || !m.data) return setSyncStatus('error', `Server error (${m.status})`);
+    const at = m.data.updatedAt || 0;
+    if (at === 0) { if (S.tasks.length || S.brands.length) return syncPush(); return setSyncStatus('ok'); }
+    if (at === SYNC.at) { if (SYNC.dirty) return syncPush(); SYNC.hash = JSON.stringify(syncPayload()); SYNC.lastAt = Date.now(); return setSyncStatus('ok'); }
+    const full = await syncApi('GET');
+    if (full.status !== 200) return setSyncStatus('error', `Server error (${full.status})`);
+    if (initial && !SYNC.at) { SYNC.conflict = {remote:full.data, kind:'first'}; setSyncStatus('conflict'); return openSync(true); }
+    if (SYNC.dirty) { SYNC.conflict = {remote:full.data, kind:'diverged'}; setSyncStatus('conflict'); return openSync(true); }
+    applyRemote(full.data); notify('Updated from your other device ☁️');
+  } catch(e){ setSyncStatus('offline', 'Offline — will retry'); }
+}
+function renderSync(){
+  const el = $('#sync'), st = SYNC.status, t = SYNC.lastAt ? new Date(SYNC.lastAt) : null;
+  if (!SYNC.pass) el.innerHTML = `<button class="x" id="syClose" aria-label="Close">✕</button><h4>Sync across devices</h4>
+    <p>Keep the same brands, tasks, timers and cats on your phone and laptop. Enter the passcode you set on your server.</p>
+    <input id="syIn" type="password" placeholder="Passcode" autocomplete="off" aria-label="Passcode">
+    ${SYNC.msg ? `<div class="msg">${esc(SYNC.msg)}</div>` : ''}
+    <div class="row"><button class="cta" id="syConnect" type="button">Connect</button></div>`;
+  else if (SYNC.conflict) el.innerHTML = `<button class="x" id="syClose" aria-label="Close">✕</button><h4>${SYNC.conflict.kind === 'first' ? 'The cloud already has data' : 'Your devices disagree'}</h4>
+    <p>${SYNC.conflict.kind === 'first' ? 'Another device already saved data. A new device should usually use the cloud version.' : 'This device and the cloud both changed since the last sync. Pick the one to keep — the other is replaced.'}</p>
+    <div class="row"><button class="cta" id="syCloud" type="button">Use cloud data</button><button class="btn" id="syDevice" type="button">Use this device</button></div>`;
+  else el.innerHTML = `<button class="x" id="syClose" aria-label="Close">✕</button><h4>${st === 'ok' ? 'Synced ✓' : st === 'offline' ? 'Offline' : st === 'error' ? 'Sync problem' : 'Syncing…'}</h4>
+    <p>${st === 'ok' && t ? `Last sync ${pad(t.getHours())}:${pad(t.getMinutes())}. Changes upload a moment after you make them and arrive on your other devices when you open or return to the page.` : esc(SYNC.msg || 'Working…')}</p>
+    ${st === 'error' && SYNC.msg ? `<div class="msg">${esc(SYNC.msg)}</div>` : ''}
+    <div class="row"><button class="cta" id="syNow" type="button">Sync now</button><button class="btn dng" id="syOff" type="button">Disconnect this device</button></div>`;
+}
+function openSync(show = $('#sync').hidden){ const el = $('#sync'); el.hidden = !show; if (show) { renderSync(); $('#syIn')?.focus(); } }
+async function syncConnect(){
+  const v = $('#syIn').value; if (!v) return $('#syIn').focus();
+  SYNC.pass = v; SYNC.at = 0; SYNC.dirty = false; SYNC.conflict = null; setSyncStatus('syncing');
+  await syncPull(true);
+  if (SYNC.status === 'error' || SYNC.status === 'offline') { const msg = SYNC.msg; SYNC.pass = ''; saveSync(); setSyncStatus('off', msg); return; }
+  saveSync();
+  if (SYNC.status === 'ok') notify('Cloud sync is on ☁️ — this device is connected');
+  renderSync();
+}
+$('#sync').addEventListener('click', async e => {
+  const id = e.target.closest('button')?.id; if (!id) return;
+  if (id === 'syClose') openSync(false);
+  if (id === 'syConnect') syncConnect();
+  if (id === 'syNow') { clearTimeout(syncPushT); if (SYNC.dirty) await syncPush(); else await syncPull(); }
+  if (id === 'syCloud') { const c = SYNC.conflict; SYNC.conflict = null; applyRemote(c.remote); notify('Using the cloud version ☁️'); saveSync(); renderSync(); }
+  if (id === 'syDevice') { SYNC.conflict = null; SYNC.dirty = true; await syncPush(true); if (SYNC.status === 'ok') notify('This device’s data replaced the cloud copy'); }
+  if (id === 'syOff') { if (!await ask({title:'Disconnect this device?', body:'Your data stays here and in the cloud. This device just stops syncing.', ok:'Yes, disconnect', danger:true})) return; SYNC.pass = ''; SYNC.at = 0; SYNC.dirty = false; SYNC.conflict = null; saveSync(); setSyncStatus('off'); renderSync(); }
+});
+$('#sync').addEventListener('keydown', e => { if (e.target.id === 'syIn' && e.key === 'Enter') { e.preventDefault(); syncConnect(); } if (e.key === 'Escape') { e.stopPropagation(); openSync(false); } });
+$('#syncBtn').onclick = $('#syncBtn2').onclick = () => openSync();
+setInterval(() => { if (SYNC.pass && !document.hidden) syncPull(); }, 45000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) syncPull(); });
+addEventListener('online', () => { if (SYNC.dirty) syncPush(); else syncPull(); });
+addEventListener('focus', () => syncPull());
+setSyncStatus(SYNC.pass ? 'syncing' : 'off');
+if (SYNC.pass) syncPull();
 
 /* ---------- theme (dark brown / cream, from the brand kit) ---------- */
 function pattern(stroke){
