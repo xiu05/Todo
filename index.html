@@ -288,6 +288,40 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 .madd .cta{margin-left:auto;margin-top:4px}
 .mlnk{display:inline-block;margin-top:8px;color:var(--muted);border-bottom:1px solid transparent} .mlnk:hover{color:var(--ink);border-color:var(--ink)}
 
+/* ---------- pet cat ---------- */
+#petToggle{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);color:var(--muted);text-align:center;font-size:15px;filter:grayscale(1);opacity:.7;transition:.15s}
+#petToggle.on{border-color:var(--ink);filter:none;opacity:1}
+.fset{display:none;justify-content:center;gap:10px;margin-bottom:12px}
+.fset button{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;border-radius:99px;border:1.5px solid var(--line);color:var(--muted)}
+#pet{position:fixed;bottom:0;left:260px;z-index:45;pointer-events:none}
+#pet[hidden]{display:none}
+#pet.walk{transition:left var(--dur,3s) linear}
+#petBtn{pointer-events:auto;display:block;color:var(--ink);width:var(--w,60px);transform:scaleX(var(--dir,1));cursor:pointer}
+#petBtn svg{width:100%;display:block;overflow:visible}
+#pet.walk #petBtn svg{animation:waddle .45s ease-in-out infinite}
+@keyframes waddle{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-3px)}}
+#pet.happy #petBtn svg{animation:hop .45s ease-out 3}
+@keyframes hop{50%{transform:translateY(-18px)}}
+#pet.sleep #petBtn svg{transform:translateY(6px) scaleY(.93)}
+.ptail{transform-origin:56px 62px;animation:wag 3s ease-in-out infinite}
+.peyes circle{animation:blink 5s infinite;transform-box:fill-box;transform-origin:center}
+#pet .pfill{fill:var(--card)}
+#pet .pzz{font:500 13px var(--mono);fill:var(--muted);animation:zz 2.4s ease-in-out infinite}
+#petBubble{position:absolute;bottom:100%;left:50%;transform:translate(-50%,8px);margin-bottom:4px;background:var(--ink);color:var(--card);font:500 12px/1.3 var(--mono);padding:7px 11px;border-radius:12px 12px 12px 3px;
+  width:max-content;max-width:210px;opacity:0;transition:.25s;pointer-events:none;text-align:left}
+#petBubble.on{opacity:1;transform:translate(-50%,0)}
+.heart{position:fixed;z-index:46;pointer-events:none;color:var(--red);font-size:18px;animation:paw .95s ease-out forwards}
+#petCard{position:fixed;bottom:84px;left:260px;z-index:66;width:262px;background:var(--card);border:2px solid var(--ink);border-radius:20px;box-shadow:var(--shadow);padding:14px 16px 14px;animation:drop .2s ease}
+#petCard[hidden]{display:none}
+.pc-h{display:flex;align-items:center;gap:8px;justify-content:space-between}
+.pc-h b{font:900 22px/1.1 var(--disp);letter-spacing:-.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pc-h input{flex:1;min-width:0;border:0;border-bottom:2px solid var(--ink);background:none;outline:0;font:800 18px var(--disp);padding:2px 0}
+.pcr{font:500 11px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted);white-space:nowrap} .pcr:hover{color:var(--ink)}
+.pc-st{color:var(--accent);margin-top:2px}
+#pcLove{color:var(--red);font-size:19px;letter-spacing:2px;margin:6px 0 2px}
+.pc-meta{color:var(--muted);line-height:1.6;text-transform:none;letter-spacing:.02em;font-size:11.5px}
+.pc-act{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
 /* ---------- timer ---------- */
 .tbtn{flex:none;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);font-size:11px;text-align:center;color:var(--muted);transition:.15s;justify-self:end}
 .tbtn:hover{border-color:var(--ink);color:var(--ink)}
@@ -393,9 +427,6 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 @keyframes fall{to{transform:translateY(115vh) rotate(360deg)}}
 .paw{position:fixed;z-index:90;pointer-events:none;font-size:22px;animation:paw .8s ease-out forwards}
 @keyframes paw{to{transform:translateY(-46px) scale(1.4);opacity:0}}
-#walker{position:fixed;bottom:0;left:-80px;font-size:40px;z-index:40;cursor:pointer;animation:walk 14s linear forwards;user-select:none}
-@keyframes walk{to{left:calc(100vw + 20px)}}
-#walker span{display:inline-block;animation:bob .5s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(-4px)}}
 
 /* ---------- responsive ---------- */
@@ -422,6 +453,8 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   .ptool .st span{display:inline} .ptool .st{padding:3px 10px}
   .nbForm input{font-size:46px}
   .cday{min-height:54px;padding:4px} .cchips{display:none} .cdots{display:flex}
+  #petToggle,#themeBtn{display:none} .fset{display:flex}
+  #petCard{left:12px!important;bottom:80px}
   #fab{right:14px;bottom:14px} #qa{right:12px;bottom:70px} #musicBtn{left:14px;bottom:14px} #timerPill{left:74px;bottom:22px} #tpName{display:none} #music{left:12px;bottom:74px}
   #toast{bottom:76px}
   #drawer{top:auto;width:100vw;height:90vh;transform:translateY(105%);border-left:0;border-top:3px solid var(--ink);border-radius:26px 26px 0 0}
@@ -436,7 +469,7 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   <nav class="nav">
     <button id="logo" title="psst… pet me" aria-label="Purrgress"></button>
     <div class="tabs"><button data-tab="brands">Brands</button><button data-tab="calendar">Calendar</button><button data-tab="deadlines">Deadlines</button></div>
-    <span id="saved" class="mono" role="status"></span><span id="clock" class="mono"></span><button id="themeBtn" aria-label="Switch light/dark theme"></button>
+    <span id="saved" class="mono" role="status"></span><span id="clock" class="mono"></span><button id="petToggle" aria-label="Show or hide your pet cat" title="Pet cat on/off">🐾</button><button id="themeBtn" aria-label="Switch light/dark theme"></button>
   </nav>
 
   <div id="stage">
@@ -447,7 +480,7 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   </div>
 
   <section id="card" class="card"></section>
-  <footer class="mono">Press N for a quick task · tap a task to edit or comment · saved on this device 🐾</footer>
+  <footer class="mono"><div class="fset"><button id="themeBtn2" type="button"></button><button id="petToggle2" type="button"></button></div>Press N for a quick task · tap a task to edit or comment · saved on this device 🐾</footer>
 </div>
 <div id="bubble"></div>
 
@@ -493,6 +526,14 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   </div>
   <div class="dfoot mono"><span id="created"></span><span class="dbtn"><button id="dDel">Delete</button><button id="dSave" class="cta">Save</button></span></div>
 </aside>
+<div id="pet" hidden><div id="petBubble" role="status"></div><button id="petBtn" aria-label="Your pet cat — click to pet"></button></div>
+<div id="petCard" hidden role="dialog" aria-label="Your pet cat">
+  <div class="pc-h" id="pcHead"></div>
+  <div class="pc-st mono" id="pcSt"></div>
+  <div id="pcLove" aria-label="Affection"></div>
+  <div class="pc-meta mono" id="pcMeta"></div>
+  <div class="pc-act"><button class="cta" id="pcFeed" type="button">Give treat 🐟</button><button class="btn" id="pcHide" type="button">Hide cat</button></div>
+</div>
 <div id="timerPill" hidden role="timer"><i class="rec"></i><span id="tpTime">00:00:00</span><span id="tpName"></span><button id="tpStop" aria-label="Stop timer" title="Stop timer">■</button></div>
 <button id="musicBtn" aria-label="Music"><span class="vin"></span><b>♪</b></button>
 <section id="music" aria-label="Work music" aria-hidden="true">
@@ -604,6 +645,8 @@ const now = new Date();
 S.cal = S.cal || {y:now.getFullYear(), m:now.getMonth(), sel:iso(now)};
 if (!['brands','calendar','deadlines'].includes(S.tab)) S.tab = 'brands';
 S.music = S.music || {tracks:[], idx:0};
+S.pet = Object.assign({on:true, name:'', love:30, treats:0, done:0, seeded:false, asked:false}, S.pet || {});
+if (!S.pet.seeded) { S.tasks.forEach(t => { if (t.done) { t.credited = true; S.pet.done++; } }); S.pet.seeded = true; }
 S.projects.forEach(p => { p.sessions = p.sessions || []; });
 if (S.timer && !S.projects.some(p => p.id === S.timer.pid)) S.timer = null;
 if (S.brand !== '+' && !S.brands.some(b => b.id === S.brand)) S.brand = S.brands[0]?.id || '+';
@@ -632,7 +675,7 @@ function autoProject(pid){
   else if (p.status === 'done') p.status = 'doing';
   else if (p.status === 'todo' && ts.some(t => t.status !== 'todo')) p.status = 'doing';
 }
-function setStatus(t, s){ t.status = s; t.done = s === 'done'; autoProject(t.pid); save(); }
+function setStatus(t, s){ const was = t.done; t.status = s; t.done = s === 'done'; autoProject(t.pid); if (t.done && !was && !t.credited) { t.credited = true; creditPet(); } save(); }
 
 const byDue = (a, b) => (a.due || '9') < (b.due || '9') ? -1 : (a.due || '9') > (b.due || '9') ? 1 : 0;
 function stats(ts){
@@ -926,6 +969,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('pointerdown', e => {
   if (cal && !cal.el.contains(e.target) && !cal.anchor.contains(e.target)) closeCal();
+  if (!$('#petCard').hidden && !$('#petCard').contains(e.target) && !$('#petBtn').contains(e.target) && !$('#dlg').contains(e.target)) closePetCard();
   if (qaOpen && !$('#qa').contains(e.target) && !$('#fab').contains(e.target) && !e.target.closest('#calpop,#toast')) closeQA();
 }, true);
 
@@ -946,10 +990,11 @@ function startTimer(pid){
   const was = S.timer && projOf(S.timer.pid); if (S.timer) stopTimer(true);
   S.timer = {pid, s:Date.now()}; save(); render(); tickTimer();
   toast(was && was.id !== pid ? `Switched timer → ${q(projOf(pid).name)}` : `Timer started — ${q(projOf(pid).name)}`);
+  petReact('timer');
 }
 function stopTimer(silent){
   if (!S.timer) return; const {pid, s: st} = S.timer, e = Date.now(), p = projOf(pid); S.timer = null;
-  if (p && e - st >= 1000) { (p.sessions = p.sessions || []).push({s:st, e}); if (!silent) toast(`Logged ${fmtDur(e - st)} on ${q(p.name)}`); }
+  if (p && e - st >= 1000) { (p.sessions = p.sessions || []).push({s:st, e}); if (!silent) { toast(`Logged ${fmtDur(e - st)} on ${q(p.name)}`); petReact('timerStop', fmtDur(e - st)); } }
   save(); render(); tickTimer();
 }
 function tickTimer(){
@@ -1456,6 +1501,7 @@ addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (cal) return closeCal();
     if (qaOpen) return closeQA();
+    if (!$('#petCard').hidden) return closePetCard();
     if (openId) return tryCloseDrawer();
     return;
   }
@@ -1506,14 +1552,148 @@ addEventListener('pointermove', e => { // the hero cat's eyes follow your pointe
   const m = Math.hypot(dx, dy) || 1, k = Math.min(m / 140, 1), s = document.documentElement.style;
   s.setProperty('--ex', (dx / m * k * 4).toFixed(1) + 'px'); s.setProperty('--ey', (dy / m * k * 3.5).toFixed(1) + 'px');
 }, {passive:true});
-function walker(){
-  if (document.hidden) return schedule();
-  const w = document.createElement('div'); w.id = 'walker'; w.innerHTML = '<span>🐈</span>'; document.body.appendChild(w);
-  w.onclick = () => { say('prrrrr… 💕'); paw(w.getBoundingClientRect().left + 20, innerHeight - 60); };
-  w.onanimationend = () => { w.remove(); schedule(); };
+/* ---------- pet cat: low-maintenance tamagotchi (no way to fail — it just naps) ---------- */
+const STAGES = ['kitten', 'cat', 'fancy cat'], STAGE_AT = [0, 5, 20];
+const petStage = () => S.pet.done >= STAGE_AT[2] ? 2 : S.pet.done >= STAGE_AT[1] ? 1 : 0;
+const petName = () => S.pet.name || 'Your cat';
+let petPose = 'sit', petBusy = 0, petX = 0, petDir = 1, petLoop = 0, petIdleAt = Date.now(), petBubT = 0, petCardT = 0, petQuick = 0;
+function petSVG(pose, stage){
+  const eyes = pose === 'sleep' ? '<path d="M29 31q4 4 8 0M43 31q4 4 8 0" stroke-width="2.6"/>'
+    : pose === 'happy' ? '<path d="M29 32q4-5 8 0M43 32q4-5 8 0" stroke-width="2.8"/>'
+    : pose === 'focus' ? '<path d="M29 31h8M43 31h8" stroke-width="2.8"/>'
+    : '<g class="peyes"><circle cx="33" cy="30" r="2.6" fill="currentColor" stroke="none"/><circle cx="47" cy="30" r="2.6" fill="currentColor" stroke="none"/></g>';
+  return `<svg viewBox="0 0 80 72" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <g class="ptail"><path d="M56 62C70 62 75 48 67 43"/></g>
+    <path class="pfill" d="M24 66C22 50 30 44 40 44C50 44 58 50 56 66Z"/>
+    <path d="M34 66v-6M46 66v-6" stroke-width="2.4"/>
+    ${stage >= 1 ? '<path d="M40 47l-8-4v8zM40 47l8-4v8z" fill="var(--orange)" stroke-width="2"/><circle cx="40" cy="47" r="2" fill="currentColor" stroke="none"/>' : ''}
+    <path class="pfill" d="M22 30C20 18 26 10 30 6L36 12Q40 11 44 12L50 6C54 10 60 18 58 30C57 38 50 42 40 42C30 42 23 38 22 30Z"/>
+    ${stage >= 2 ? '<path d="M32 10L33 2L40 7L47 2L48 10Z" fill="var(--yellow)" stroke-width="2"/>' : ''}
+    ${eyes}
+    <path d="M37 36q1.5 2 3 0q1.5 2 3 0" stroke-width="2.2"/>
+    <path d="M22 32l-8-2M22 36l-8 2M58 32l8-2M58 36l8 2" stroke-width="2"/>
+    ${pose === 'sleep' ? '<text class="pzz" x="58" y="12">z</text>' : ''}
+  </svg>`;
 }
-const schedule = () => setTimeout(walker, 45000 + Math.random() * 60000);
-setTimeout(walker, 20000);
+function setPose(p){
+  petPose = p; const el = $('#pet'); el.className = p;
+  $('#petBtn').innerHTML = petSVG(p, petStage());
+  $('#petBtn').style.setProperty('--w', ([48, 58, 64][petStage()] * (innerWidth < 760 ? .9 : 1)) + 'px');
+}
+const petRange = () => innerWidth < 760 ? [100, Math.max(130, innerWidth - 190)] : [260, Math.max(300, innerWidth - 250)];
+function petWalk(){
+  const [a, b] = petRange(); let x = a + Math.random() * (b - a);
+  if (Math.abs(x - petX) < 70) x = petX < (a + b) / 2 ? petX + 130 : petX - 130;
+  x = Math.max(a, Math.min(b, x));
+  const dur = Math.max(1.6, Math.abs(x - petX) / 42); petDir = x >= petX ? 1 : -1;
+  $('#pet').style.setProperty('--dur', dur + 's'); $('#petBtn').style.setProperty('--dir', petDir);
+  setPose('walk'); petX = x; $('#pet').style.left = x + 'px';
+  return dur * 1000;
+}
+function petLine(){
+  const open = S.tasks.filter(t => !t.done), od = open.filter(t => t.due && diff(t.due) < 0).length, td = open.filter(t => t.due && diff(t.due) === 0).length, h = new Date().getHours();
+  const pool = ['prrr…', '*slow blink*', 'what are we working on?', 'I’m just here for the vibes 🐾'];
+  if (h < 11) pool.push('good morning ☀️'); else if (h >= 18) pool.push('nice evening for focus 🌙');
+  if (od) pool.push(`${od} overdue… no pressure, one at a time`);
+  if (td) pool.push(`${td} due today — you’ve got this`);
+  if (!open.length && S.tasks.length) pool.push('all clear. nap time?');
+  return pick(pool);
+}
+function petSay(msg, ms = 3400){ const b = $('#petBubble'); if (!S.pet.on) return; b.textContent = msg; b.classList.add('on'); clearTimeout(petBubT); petBubT = setTimeout(() => b.classList.remove('on'), ms); }
+function hearts(n = 3){
+  const r = $('#petBtn').getBoundingClientRect();
+  for (let i = 0; i < n; i++) { const h = document.createElement('span'); h.className = 'heart'; h.textContent = '❤'; h.style.left = r.left + r.width / 2 - 8 + (Math.random() - .5) * 34 + 'px'; h.style.top = r.top - 4 + 'px'; h.style.animationDelay = i * .12 + 's'; document.body.appendChild(h); setTimeout(() => h.remove(), 1400); }
+}
+function petReact(kind, extra){
+  if (!S.pet.on) return;
+  if (kind === 'done') { petBusy = Date.now() + 2200; setPose('happy'); hearts(3); petSay(pick(PRAISE)); setTimeout(() => { if (petPose === 'happy') setPose(S.timer ? 'focus' : 'sit'); }, 1600); }
+  if (kind === 'pet') {
+    S.pet.love = Math.min(100, S.pet.love + 2); save(); petBusy = Date.now() + 1500; setPose('happy'); hearts(2); petSay(pick(['prrrrr…', 'mrrp! 💕', '*happy wiggle*', 'more pets pls', '❤']));
+    setTimeout(() => { if (petPose === 'happy') setPose(S.timer ? 'focus' : 'sit'); }, 1500);
+    petQuick++; clearTimeout(petQuick.t); setTimeout(() => petQuick = Math.max(0, petQuick - 1), 4000); if (petQuick >= 10) { petQuick = 0; catRain(16); say('Cat party! 🎉'); }
+  }
+  if (kind === 'feed') {
+    if (S.pet.treats < 1) return petSay('no treats yet — finish a task to earn one 🐟');
+    S.pet.treats--; S.pet.love = Math.min(100, S.pet.love + 10); save(); petBusy = Date.now() + 2200; setPose('happy'); hearts(4); petSay('nom nom nom 😻');
+    setTimeout(() => { if (petPose === 'happy') setPose(S.timer ? 'focus' : 'sit'); }, 1800);
+  }
+  if (kind === 'timer') { setPose('focus'); petSay('focus mode 🎧'); }
+  if (kind === 'timerStop') { setPose('sit'); petSay(extra ? `nice session! ${extra}` : 'welcome back!'); }
+}
+function creditPet(){
+  const before = petStage(); S.pet.done++; S.pet.treats = Math.min(99, S.pet.treats + 1); S.pet.love = Math.min(100, S.pet.love + 3);
+  if (petStage() > before) { notify(`${petName()} grew into a ${STAGES[petStage()]}! 🎉`); if (S.pet.on) setPose(petPose); }
+  petReact('done'); if (!$('#petCard').hidden) renderPetCard();
+}
+function petTick(){
+  clearTimeout(petLoop); if (!S.pet.on) return;
+  let wait = 5000 + Math.random() * 5000;
+  if (Date.now() < petBusy) wait = petBusy - Date.now() + 200;
+  else {
+    const h = new Date().getHours(), idle = Date.now() - petIdleAt;
+    if (S.timer) { setPose('focus'); wait = 9000; if (Math.random() < .35) petSay(pick(['you’re doing great', 'focus focus focus 🎧', 'I’m watching the clock for you'])); }
+    else if (h >= 23 || h < 6 || idle > 240000) { setPose('sleep'); wait = 12000; }
+    else if (Math.random() < .55) { wait = petWalk() + 600; setTimeout(() => { if (petPose === 'walk') setPose('sit'); }, wait - 500); }
+    else { setPose('sit'); if (Math.random() < .3) petSay(petLine()); }
+  }
+  petLoop = setTimeout(petTick, wait);
+}
+function openPetCard(editing){
+  const c = $('#petCard'); c.hidden = false; renderPetCard(editing);
+  const r = $('#petBtn').getBoundingClientRect(); c.style.left = Math.max(8, Math.min(innerWidth - 274, r.left - 100)) + 'px';
+  resetCardTimer();
+  if (editing) $('#pcIn')?.focus();
+}
+function closePetCard(){ $('#petCard').hidden = true; clearTimeout(petCardT); }
+function resetCardTimer(){ clearTimeout(petCardT); petCardT = setTimeout(() => { if (!$('#petCard').matches(':hover') && !$('#petCard').contains(document.activeElement)) closePetCard(); else resetCardTimer(); }, 9000); }
+function renderPetCard(editing){
+  const p = S.pet, st = petStage(), next = STAGE_AT[st + 1], f = Math.round(p.love / 20);
+  $('#pcHead').innerHTML = editing
+    ? `<input id="pcIn" maxlength="16" placeholder="Give your cat a name" value="${esc(p.name)}" autocomplete="off" aria-label="Cat name"><button class="cta" id="pcSave" type="button">Save</button>`
+    : `<b>${esc(petName())}</b><button class="pcr" id="pcRename" type="button">✎ ${p.name ? 'Rename' : 'Name it'}</button>`;
+  $('#pcSt').textContent = `${STAGES[st]} · level ${st + 1}`;
+  $('#pcLove').textContent = '♥'.repeat(f) + '♡'.repeat(5 - f);
+  $('#pcMeta').innerHTML = `🐟 ${p.treats} treat${p.treats === 1 ? '' : 's'} · ${p.done} task${p.done === 1 ? '' : 's'} done${next ? `<br>${next - p.done} more to become a ${STAGES[st + 1]}` : '<br>fully grown & fancy 👑'}<br>no upkeep — it naps when you’re away`;
+}
+async function savePetName(){
+  const v = $('#pcIn').value.trim().slice(0, 16); if (!v) { toast('Give your cat a name'); return $('#pcIn').focus(); }
+  const old = S.pet.name;
+  if (old === v) { renderPetCard(false); return toast('No changes to save'); }
+  if (old && !await ask({title:'Rename your cat?', body:nameCh(old, v), ok:'Yes, rename'})) return;
+  S.pet.name = v; S.pet.asked = true; save(); renderPetCard(false); resetCardTimer();
+  notify(old ? `Cat ${q(old)} has been renamed to ${q(v)}` : `Your cat is now called ${q(v)}`); petSay(`${v}! I like it 😸`);
+}
+$('#petBtn').onclick = () => { petIdleAt = Date.now(); petReact('pet'); openPetCard(false); };
+$('#petCard').addEventListener('click', e => {
+  const id = e.target.closest('button')?.id; resetCardTimer();
+  if (id === 'pcRename') { renderPetCard(true); $('#pcIn').focus(); $('#pcIn').select(); }
+  if (id === 'pcSave') savePetName();
+  if (id === 'pcFeed') { petReact('feed'); renderPetCard(!!$('#pcIn')); }
+  if (id === 'pcHide') setPetOn(false);
+});
+$('#petCard').addEventListener('keydown', e => { if (e.target.id === 'pcIn' && e.key === 'Enter' && !e.isComposing) { e.preventDefault(); savePetName(); } if (e.target.id === 'pcIn' && e.key === 'Escape') { e.stopPropagation(); renderPetCard(false); } });
+$('#petCard').addEventListener('mouseenter', () => clearTimeout(petCardT)); $('#petCard').addEventListener('mouseleave', resetCardTimer);
+function setPetOn(on){
+  S.pet.on = on; save(); applyPet(); closePetCard();
+  if (on) { notify(S.pet.name ? `${S.pet.name} is back! 🐾` : 'Your cat has moved in 🐾'); setTimeout(() => petSay(S.pet.name ? `hi, it’s ${S.pet.name} 😺` : 'hi! give me a name? 😺'), 500); }
+  else notify(`${petName()} went off to nap. Tap 🐾 to bring them back.`);
+}
+function applyPet(){
+  const on = S.pet.on;
+  $('#pet').hidden = !on;
+  ['#petToggle'].forEach(i => $(i).classList.toggle('on', on)); $('#petToggle').title = on ? 'Hide your cat' : 'Show your cat';
+  $('#petToggle2').textContent = on ? '🐾 Hide cat' : '🐾 Show cat';
+  clearTimeout(petLoop);
+  if (on) {
+    const [a, b] = petRange(); petX = Math.min(Math.max(petX || a + (b - a) * .4, a), b); $('#pet').style.left = petX + 'px'; setPose(S.timer ? 'focus' : 'sit');
+    petLoop = setTimeout(petTick, 2500);
+  }
+}
+$('#petToggle').onclick = $('#petToggle2').onclick = () => setPetOn(!S.pet.on);
+['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { petIdleAt = Date.now(); if (petPose === 'sleep' && S.pet.on) { const h = new Date().getHours(); if (h < 23 && h >= 6) setPose('sit'); } }, {passive:true}));
+addEventListener('resize', () => { if (S.pet.on) { const [a, b] = petRange(); petX = Math.min(Math.max(petX, a), b); $('#pet').style.left = petX + 'px'; } });
+applyPet();
+if (S.pet.on && !S.pet.name && !S.pet.asked) setTimeout(() => { if (S.pet.on && !S.pet.name) { S.pet.asked = true; save(); openPetCard(true); petSay('hi! what should you call me? 😺', 6000); } }, 1800);
 
 /* ---------- theme (dark brown / cream, from the brand kit) ---------- */
 function pattern(stroke){
@@ -1526,8 +1706,9 @@ function applyTheme(){
   document.documentElement.dataset.theme = t;
   document.documentElement.style.setProperty('--pattern', pattern(t));
   $('#themeBtn').textContent = t === 'dark' ? '☀' : '☾'; $('#themeBtn').title = t === 'dark' ? 'Switch to light' : 'Switch to dark';
+  $('#themeBtn2').textContent = t === 'dark' ? '☀ Light mode' : '☾ Dark mode';
 }
-$('#themeBtn').onclick = () => { S.theme = S.theme === 'light' ? 'dark' : 'light'; save(); applyTheme(); };
+$('#themeBtn').onclick = $('#themeBtn2').onclick = () => { S.theme = S.theme === 'light' ? 'dark' : 'light'; save(); applyTheme(); };
 $('#logo').innerHTML = logoSVG;
 applyTheme();
 render(); tickTimer();
