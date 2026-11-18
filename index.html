@@ -1806,7 +1806,7 @@ $('#petToggle').onclick = $('#petToggle2').onclick = () => setPetOn(!S.pet.on);
 ['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { petIdleAt = Date.now(); CATS.forEach(c => { if (c.pose === 'sleep' && catShown(c) && !c.busy && !nightIdle()) setPose(c, 'sit'); }); }, {passive:true}));
 addEventListener('resize', () => CATS.forEach(c => { if (c.placed) place(c, c.x, c.y); }));
 mkCat(false); mkCat(true); applyPet();
-if (S.pet.on && S.pet.friend.on && !S.pet.friend.seen) setTimeout(() => { S.pet.friend.seen = true; save(); notify(`${S.pet.friend.name}, a friendly orange cat, dropped by! 🧡`); }, 1500);
+if (S.pet.on && S.pet.friend.on && !S.pet.friend.seen) setTimeout(() => { S.pet.friend.seen = true; save(); catSpeak(CATS[1], `hi! I’m ${S.pet.friend.name} 🧡`, 4500); }, 1500);
 if (S.pet.on && !S.pet.name && !S.pet.asked) setTimeout(() => { if (S.pet.on && !S.pet.name) { S.pet.asked = true; save(); openPetCard('pet'); petSay('hi! what should you call me? 😺', 6000); } }, 1800);
 
 /* ---------- theme (dark brown / cream, from the brand kit) ---------- */
