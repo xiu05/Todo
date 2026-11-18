@@ -293,23 +293,26 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 #petToggle.on{border-color:var(--ink);filter:none;opacity:1}
 .fset{display:none;justify-content:center;gap:10px;margin-bottom:12px}
 .fset button{font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:6px 12px;border-radius:99px;border:1.5px solid var(--line);color:var(--muted)}
-#pet{position:fixed;bottom:0;left:260px;z-index:45;pointer-events:none}
-#pet[hidden]{display:none}
-#pet.walk{transition:left var(--dur,3s) linear}
-#petBtn{pointer-events:auto;display:block;color:var(--ink);width:var(--w,60px);transform:scaleX(var(--dir,1));cursor:pointer}
-#petBtn svg{width:100%;display:block;overflow:visible}
-#pet.walk #petBtn svg{animation:waddle .45s ease-in-out infinite}
+.pcat{position:fixed;left:0;top:0;z-index:45;pointer-events:none;will-change:transform}
+.pcat[hidden]{display:none}
+.pcat.walk,.pcat.run{transition:transform var(--dur,3s) linear}
+.pbtn{pointer-events:auto;display:block;color:var(--ink);width:var(--w,60px);transform:scaleX(var(--dir,1));cursor:pointer}
+.pbtn svg{width:100%;display:block;overflow:visible}
+.pcat.walk .pbtn svg{animation:waddle .45s ease-in-out infinite}
+.pcat.run .pbtn svg{animation:waddle .22s ease-in-out infinite}
 @keyframes waddle{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-3px)}}
-#pet.happy #petBtn svg{animation:hop .45s ease-out 3}
+.pcat.happy .pbtn svg{animation:hop .45s ease-out 3}
 @keyframes hop{50%{transform:translateY(-18px)}}
-#pet.sleep #petBtn svg{transform:translateY(6px) scaleY(.93)}
+.pcat.sleep .pbtn svg{transform:translateY(6px) scaleY(.93)}
 .ptail{transform-origin:56px 62px;animation:wag 3s ease-in-out infinite}
 .peyes circle{animation:blink 5s infinite;transform-box:fill-box;transform-origin:center}
-#pet .pfill{fill:var(--card)}
-#pet .pzz{font:500 13px var(--mono);fill:var(--muted);animation:zz 2.4s ease-in-out infinite}
-#petBubble{position:absolute;bottom:100%;left:50%;transform:translate(-50%,8px);margin-bottom:4px;background:var(--ink);color:var(--card);font:500 12px/1.3 var(--mono);padding:7px 11px;border-radius:12px 12px 12px 3px;
-  width:max-content;max-width:210px;opacity:0;transition:.25s;pointer-events:none;text-align:left}
-#petBubble.on{opacity:1;transform:translate(-50%,0)}
+.pcat .pfill{fill:var(--card)}
+.pcat.friend .pfill{fill:color-mix(in srgb,var(--orange) 42%,var(--card))}
+.pcat .pzz{font:500 13px var(--mono);fill:var(--muted);animation:zz 2.4s ease-in-out infinite}
+.pbub{position:absolute;bottom:100%;left:50%;transform:translate(-50%,8px);margin-bottom:4px;background:var(--ink);color:var(--card);font:500 12px/1.3 var(--mono);padding:7px 11px;border-radius:12px 12px 12px 3px;
+  width:max-content;max-width:200px;opacity:0;transition:.25s;pointer-events:none;text-align:left}
+.pbub.on{opacity:1;transform:translate(-50%,0)}
+.pcat.friend .pbub{background:var(--yellow);color:#2B2019}
 .heart{position:fixed;z-index:46;pointer-events:none;color:var(--red);font-size:18px;animation:paw .95s ease-out forwards}
 #petCard{position:fixed;bottom:84px;left:260px;z-index:66;width:262px;background:var(--card);border:2px solid var(--ink);border-radius:20px;box-shadow:var(--shadow);padding:14px 16px 14px;animation:drop .2s ease}
 #petCard[hidden]{display:none}
@@ -321,6 +324,9 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 #pcLove{color:var(--red);font-size:19px;letter-spacing:2px;margin:6px 0 2px}
 .pc-meta{color:var(--muted);line-height:1.6;text-transform:none;letter-spacing:.02em;font-size:11.5px}
 .pc-act{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pc-fr{display:flex;align-items:center;gap:8px;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font:700 14px var(--disp)}
+.pc-fr input{flex:1;min-width:0;border:0;border-bottom:2px solid var(--ink);background:none;outline:0;font:800 15px var(--disp);padding:2px 0}
+.pc-fr .sm{font:700 12px var(--disp);padding:3px 11px}
 
 /* ---------- timer ---------- */
 .tbtn{flex:none;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);font-size:11px;text-align:center;color:var(--muted);transition:.15s;justify-self:end}
@@ -526,12 +532,12 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   </div>
   <div class="dfoot mono"><span id="created"></span><span class="dbtn"><button id="dDel">Delete</button><button id="dSave" class="cta">Save</button></span></div>
 </aside>
-<div id="pet" hidden><div id="petBubble" role="status"></div><button id="petBtn" aria-label="Your pet cat — click to pet"></button></div>
 <div id="petCard" hidden role="dialog" aria-label="Your pet cat">
   <div class="pc-h" id="pcHead"></div>
   <div class="pc-st mono" id="pcSt"></div>
   <div id="pcLove" aria-label="Affection"></div>
   <div class="pc-meta mono" id="pcMeta"></div>
+  <div class="pc-fr" id="pcFr"></div>
   <div class="pc-act"><button class="cta" id="pcFeed" type="button">Give treat 🐟</button><button class="btn" id="pcHide" type="button">Hide cat</button></div>
 </div>
 <div id="timerPill" hidden role="timer"><i class="rec"></i><span id="tpTime">00:00:00</span><span id="tpName"></span><button id="tpStop" aria-label="Stop timer" title="Stop timer">■</button></div>
@@ -646,6 +652,7 @@ S.cal = S.cal || {y:now.getFullYear(), m:now.getMonth(), sel:iso(now)};
 if (!['brands','calendar','deadlines'].includes(S.tab)) S.tab = 'brands';
 S.music = S.music || {tracks:[], idx:0};
 S.pet = Object.assign({on:true, name:'', love:30, treats:0, done:0, seeded:false, asked:false}, S.pet || {});
+S.pet.friend = Object.assign({on:true, name:'Pudding', seen:false}, S.pet.friend || {});
 if (!S.pet.seeded) { S.tasks.forEach(t => { if (t.done) { t.credited = true; S.pet.done++; } }); S.pet.seeded = true; }
 S.projects.forEach(p => { p.sessions = p.sessions || []; });
 if (S.timer && !S.projects.some(p => p.id === S.timer.pid)) S.timer = null;
@@ -1552,44 +1559,71 @@ addEventListener('pointermove', e => { // the hero cat's eyes follow your pointe
   const m = Math.hypot(dx, dy) || 1, k = Math.min(m / 140, 1), s = document.documentElement.style;
   s.setProperty('--ex', (dx / m * k * 4).toFixed(1) + 'px'); s.setProperty('--ey', (dy / m * k * 3.5).toFixed(1) + 'px');
 }, {passive:true});
-/* ---------- pet cat: low-maintenance tamagotchi (no way to fail — it just naps) ---------- */
+/* ---------- pet cats: low-maintenance tamagotchi + a friend. They stroll the screen, and sometimes play together ---------- */
 const STAGES = ['kitten', 'cat', 'fancy cat'], STAGE_AT = [0, 5, 20];
 const petStage = () => S.pet.done >= STAGE_AT[2] ? 2 : S.pet.done >= STAGE_AT[1] ? 1 : 0;
 const petName = () => S.pet.name || 'Your cat';
-let petPose = 'sit', petBusy = 0, petX = 0, petDir = 1, petLoop = 0, petIdleAt = Date.now(), petBubT = 0, petCardT = 0, petQuick = 0;
-function petSVG(pose, stage){
+const delay = ms => new Promise(res => setTimeout(res, ms));
+const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
+const CATS = []; let petEvt = 0, petEvtT = 0, petIdleAt = Date.now(), petCardT = 0, petQuick = 0;
+function petSVG(pose, stage, friend){
   const eyes = pose === 'sleep' ? '<path d="M29 31q4 4 8 0M43 31q4 4 8 0" stroke-width="2.6"/>'
-    : pose === 'happy' ? '<path d="M29 32q4-5 8 0M43 32q4-5 8 0" stroke-width="2.8"/>'
+    : pose === 'happy' || pose === 'groom' ? '<path d="M29 32q4-5 8 0M43 32q4-5 8 0" stroke-width="2.8"/>'
     : pose === 'focus' ? '<path d="M29 31h8M43 31h8" stroke-width="2.8"/>'
     : '<g class="peyes"><circle cx="33" cy="30" r="2.6" fill="currentColor" stroke="none"/><circle cx="47" cy="30" r="2.6" fill="currentColor" stroke="none"/></g>';
   return `<svg viewBox="0 0 80 72" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <g class="ptail"><path d="M56 62C70 62 75 48 67 43"/></g>
+    <g class="ptail"><path d="M56 62C70 62 75 48 67 43"/>${friend ? '<path d="M64 55l5-2M68 48l5-3" stroke-width="2.2"/>' : ''}</g>
     <path class="pfill" d="M24 66C22 50 30 44 40 44C50 44 58 50 56 66Z"/>
     <path d="M34 66v-6M46 66v-6" stroke-width="2.4"/>
-    ${stage >= 1 ? '<path d="M40 47l-8-4v8zM40 47l8-4v8z" fill="var(--orange)" stroke-width="2"/><circle cx="40" cy="47" r="2" fill="currentColor" stroke="none"/>' : ''}
+    ${pose === 'groom' ? '<path d="M53 52q9-3 6-17" stroke-width="3"/>' : ''}
+    ${!friend && stage >= 1 ? '<path d="M40 47l-8-4v8zM40 47l8-4v8z" fill="var(--orange)" stroke-width="2"/><circle cx="40" cy="47" r="2" fill="currentColor" stroke="none"/>' : ''}
     <path class="pfill" d="M22 30C20 18 26 10 30 6L36 12Q40 11 44 12L50 6C54 10 60 18 58 30C57 38 50 42 40 42C30 42 23 38 22 30Z"/>
-    ${stage >= 2 ? '<path d="M32 10L33 2L40 7L47 2L48 10Z" fill="var(--yellow)" stroke-width="2"/>' : ''}
+    ${friend ? '<path d="M36 17v5M40 15v6M44 17v5" stroke-width="2.2"/>' : ''}
+    ${!friend && stage >= 2 ? '<path d="M32 10L33 2L40 7L47 2L48 10Z" fill="var(--yellow)" stroke-width="2"/>' : ''}
     ${eyes}
     <path d="M37 36q1.5 2 3 0q1.5 2 3 0" stroke-width="2.2"/>
     <path d="M22 32l-8-2M22 36l-8 2M58 32l8-2M58 36l8 2" stroke-width="2"/>
     ${pose === 'sleep' ? '<text class="pzz" x="58" y="12">z</text>' : ''}
   </svg>`;
 }
-function setPose(p){
-  petPose = p; const el = $('#pet'); el.className = p;
-  $('#petBtn').innerHTML = petSVG(p, petStage());
-  $('#petBtn').style.setProperty('--w', ([48, 58, 64][petStage()] * (innerWidth < 760 ? .9 : 1)) + 'px');
+function mkCat(friend){
+  const el = document.createElement('div'); el.className = 'pcat' + (friend ? ' friend' : ''); el.hidden = true; el.id = friend ? 'pet2' : 'pet';
+  el.innerHTML = `<div class="pbub" id="${friend ? 'petBubble2' : 'petBubble'}" role="status"></div><button class="pbtn" id="${friend ? 'petBtn2' : 'petBtn'}" aria-label="${friend ? 'Your cat’s friend' : 'Your pet cat'} — click to pet"></button>`;
+  document.body.appendChild(el);
+  const c = {friend, el, btn:el.querySelector('.pbtn'), bub:el.querySelector('.pbub'), x:0, y:0, dir:1, pose:'sit', busy:false, loop:0, bt:0, placed:false};
+  c.btn.onclick = () => friend ? friendClick(c) : (petIdleAt = Date.now(), petReact('pet'), openPetCard(false));
+  CATS.push(c); return c;
 }
-const petRange = () => innerWidth < 760 ? [100, Math.max(130, innerWidth - 190)] : [260, Math.max(300, innerWidth - 250)];
-function petWalk(){
-  const [a, b] = petRange(); let x = a + Math.random() * (b - a);
-  if (Math.abs(x - petX) < 70) x = petX < (a + b) / 2 ? petX + 130 : petX - 130;
-  x = Math.max(a, Math.min(b, x));
-  const dur = Math.max(1.6, Math.abs(x - petX) / 42); petDir = x >= petX ? 1 : -1;
-  $('#pet').style.setProperty('--dur', dur + 's'); $('#petBtn').style.setProperty('--dir', petDir);
-  setPose('walk'); petX = x; $('#pet').style.left = x + 'px';
-  return dur * 1000;
+const catW = c => (c.friend ? 52 : [48, 58, 64][petStage()]) * (innerWidth < 760 ? .9 : 1);
+const catH = c => catW(c) * .9;
+const catShown = c => S.pet.on && (!c.friend || S.pet.friend.on);
+const bounds = c => ({x0:8, x1:Math.max(60, innerWidth - catW(c) - 8), y0:96, y1:Math.max(120, innerHeight - catH(c) - 2)});
+const nameOf = c => c.friend ? S.pet.friend.name : petName();
+function setPose(c, p){
+  c.pose = p; c.el.className = 'pcat' + (c.friend ? ' friend ' : ' ') + p; c.btn.innerHTML = petSVG(p, petStage(), c.friend);
+  c.btn.style.setProperty('--w', catW(c) + 'px'); c.btn.style.setProperty('--dir', c.dir);
 }
+function groundish(c){ return c.y > innerHeight - catH(c) - 130; }
+function place(c, x, y){
+  const b = bounds(c); c.x = clampN(x, b.x0, b.x1); c.y = clampN(y, b.y0, b.y1);
+  c.el.style.transform = `translate(${c.x}px,${c.y}px)`; c.btn.style.pointerEvents = groundish(c) ? 'auto' : 'none';
+}
+async function walkTo(c, x, y, speed = 46){
+  const b = bounds(c); x = clampN(x, b.x0, b.x1); y = clampN(y, b.y0, b.y1);
+  const dx = x - c.x, dist = Math.hypot(dx, y - c.y); if (dist < 5) return;
+  const dur = Math.max(.5, dist / speed); if (Math.abs(dx) > 6) c.dir = dx > 0 ? 1 : -1;
+  c.el.style.setProperty('--dur', dur + 's'); setPose(c, speed > 100 ? 'run' : 'walk');
+  c.x = x; c.y = y; c.el.style.transform = `translate(${x}px,${y}px)`;
+  c.btn.style.pointerEvents = (y > innerHeight - catH(c) - 130) ? 'auto' : 'none'; // never block clicks while up in the page
+  await delay(dur * 1000);
+}
+function face(c, d){ c.dir = d; c.btn.style.setProperty('--dir', d); }
+function catSpeak(c, msg, ms = 3200){ if (!catShown(c)) return; c.bub.textContent = msg; c.bub.classList.add('on'); clearTimeout(c.bt); c.bt = setTimeout(() => c.bub.classList.remove('on'), ms); }
+const petSay = (msg, ms) => catSpeak(CATS[0], msg, ms);
+function heartsAt(x, y, n = 3){
+  for (let i = 0; i < n; i++) { const h = document.createElement('span'); h.className = 'heart'; h.textContent = '❤'; h.style.left = x - 8 + (Math.random() - .5) * 34 + 'px'; h.style.top = y + 'px'; h.style.animationDelay = i * .12 + 's'; document.body.appendChild(h); setTimeout(() => h.remove(), 1400); }
+}
+const heartsOn = (c, n) => { const r = c.btn.getBoundingClientRect(); heartsAt(r.left + r.width / 2, r.top - 4, n); };
 function petLine(){
   const open = S.tasks.filter(t => !t.done), od = open.filter(t => t.due && diff(t.due) < 0).length, td = open.filter(t => t.due && diff(t.due) === 0).length, h = new Date().getHours();
   const pool = ['prrr…', '*slow blink*', 'what are we working on?', 'I’m just here for the vibes 🐾'];
@@ -1599,101 +1633,181 @@ function petLine(){
   if (!open.length && S.tasks.length) pool.push('all clear. nap time?');
   return pick(pool);
 }
-function petSay(msg, ms = 3400){ const b = $('#petBubble'); if (!S.pet.on) return; b.textContent = msg; b.classList.add('on'); clearTimeout(petBubT); petBubT = setTimeout(() => b.classList.remove('on'), ms); }
-function hearts(n = 3){
-  const r = $('#petBtn').getBoundingClientRect();
-  for (let i = 0; i < n; i++) { const h = document.createElement('span'); h.className = 'heart'; h.textContent = '❤'; h.style.left = r.left + r.width / 2 - 8 + (Math.random() - .5) * 34 + 'px'; h.style.top = r.top - 4 + 'px'; h.style.animationDelay = i * .12 + 's'; document.body.appendChild(h); setTimeout(() => h.remove(), 1400); }
-}
+const backToSit = c => { if (['happy', 'groom', 'walk', 'run'].includes(c.pose)) setPose(c, 'sit'); };
 function petReact(kind, extra){
-  if (!S.pet.on) return;
-  if (kind === 'done') { petBusy = Date.now() + 2200; setPose('happy'); hearts(3); petSay(pick(PRAISE)); setTimeout(() => { if (petPose === 'happy') setPose(S.timer ? 'focus' : 'sit'); }, 1600); }
+  if (!S.pet.on) return; const [a, f] = CATS, fOn = catShown(f);
+  if (kind === 'done') { [a, ...(fOn ? [f] : [])].forEach(c => { setPose(c, 'happy'); heartsOn(c, 2); setTimeout(() => backToSit(c), 1600); }); catSpeak(a, pick(PRAISE)); if (fOn) catSpeak(f, pick(['yay!', 'good job!', 'mew mew!'])); }
   if (kind === 'pet') {
-    S.pet.love = Math.min(100, S.pet.love + 2); save(); petBusy = Date.now() + 1500; setPose('happy'); hearts(2); petSay(pick(['prrrrr…', 'mrrp! 💕', '*happy wiggle*', 'more pets pls', '❤']));
-    setTimeout(() => { if (petPose === 'happy') setPose(S.timer ? 'focus' : 'sit'); }, 1500);
-    petQuick++; clearTimeout(petQuick.t); setTimeout(() => petQuick = Math.max(0, petQuick - 1), 4000); if (petQuick >= 10) { petQuick = 0; catRain(16); say('Cat party! 🎉'); }
+    S.pet.love = Math.min(100, S.pet.love + 2); save(); setPose(a, 'happy'); heartsOn(a, 2); catSpeak(a, pick(['prrrrr…', 'mrrp! 💕', '*happy wiggle*', 'more pets pls', '❤']));
+    setTimeout(() => backToSit(a), 1500);
+    petQuick++; setTimeout(() => petQuick = Math.max(0, petQuick - 1), 4000); if (petQuick >= 10) { petQuick = 0; catRain(16); say('Cat party! 🎉'); }
   }
   if (kind === 'feed') {
-    if (S.pet.treats < 1) return petSay('no treats yet — finish a task to earn one 🐟');
-    S.pet.treats--; S.pet.love = Math.min(100, S.pet.love + 10); save(); petBusy = Date.now() + 2200; setPose('happy'); hearts(4); petSay('nom nom nom 😻');
-    setTimeout(() => { if (petPose === 'happy') setPose(S.timer ? 'focus' : 'sit'); }, 1800);
+    if (S.pet.treats < 1) return catSpeak(a, 'no treats yet — finish a task to earn one 🐟');
+    S.pet.treats--; S.pet.love = Math.min(100, S.pet.love + 10); save(); [a, ...(fOn ? [f] : [])].forEach(c => { setPose(c, 'happy'); heartsOn(c, 3); setTimeout(() => backToSit(c), 1800); }); catSpeak(a, 'nom nom nom 😻'); if (fOn) catSpeak(f, 'share? 🥺');
   }
-  if (kind === 'timer') { setPose('focus'); petSay('focus mode 🎧'); }
-  if (kind === 'timerStop') { setPose('sit'); petSay(extra ? `nice session! ${extra}` : 'welcome back!'); }
+  if (kind === 'timer') { setPose(a, 'focus'); catSpeak(a, 'focus mode 🎧'); }
+  if (kind === 'timerStop') { setPose(a, 'sit'); catSpeak(a, extra ? `nice session! ${extra}` : 'welcome back!'); }
 }
 function creditPet(){
   const before = petStage(); S.pet.done++; S.pet.treats = Math.min(99, S.pet.treats + 1); S.pet.love = Math.min(100, S.pet.love + 3);
-  if (petStage() > before) { notify(`${petName()} grew into a ${STAGES[petStage()]}! 🎉`); if (S.pet.on) setPose(petPose); }
+  if (petStage() > before) { notify(`${petName()} grew into a ${STAGES[petStage()]}! 🎉`); CATS.forEach(c => { if (catShown(c)) setPose(c, c.pose); }); }
   petReact('done'); if (!$('#petCard').hidden) renderPetCard();
 }
-function petTick(){
-  clearTimeout(petLoop); if (!S.pet.on) return;
-  let wait = 5000 + Math.random() * 5000;
-  if (Date.now() < petBusy) wait = petBusy - Date.now() + 200;
-  else {
-    const h = new Date().getHours(), idle = Date.now() - petIdleAt;
-    if (S.timer) { setPose('focus'); wait = 9000; if (Math.random() < .35) petSay(pick(['you’re doing great', 'focus focus focus 🎧', 'I’m watching the clock for you'])); }
-    else if (h >= 23 || h < 6 || idle > 240000) { setPose('sleep'); wait = 12000; }
-    else if (Math.random() < .55) { wait = petWalk() + 600; setTimeout(() => { if (petPose === 'walk') setPose('sit'); }, wait - 500); }
-    else { setPose('sit'); if (Math.random() < .3) petSay(petLine()); }
+
+/* solo behaviour: stroll along the bottom of the screen, sometimes wander up into the page, nap at night or when you're away */
+const nightIdle = () => { const h = new Date().getHours(); return h >= 23 || h < 6 || Date.now() - petIdleAt > 240000; };
+async function wander(c){
+  const b = bounds(c), r = Math.random();
+  if (S.timer) {
+    if (!c.friend) { setPose(c, 'focus'); if (r < .35) catSpeak(c, pick(['you’re doing great', 'focus focus focus 🎧', 'I’m watching the clock for you'])); return 9000; }
+    const u = CATS[0]; await walkTo(c, u.x + (u.dir > 0 ? -58 : 58), u.y); setPose(c, 'sleep'); return 12000;
   }
-  petLoop = setTimeout(petTick, wait);
+  if (nightIdle()) { setPose(c, 'sleep'); return 12000; }
+  if (r < .5) { await walkTo(c, b.x0 + Math.random() * (b.x1 - b.x0), b.y1); setPose(c, 'sit'); return 2500 + Math.random() * 3000; }
+  if (r < .62) { await walkTo(c, c.x < innerWidth / 2 ? b.x1 : b.x0, b.y1, 150); setPose(c, 'sit'); catSpeak(c, 'zoomies!'); return 3000; }   // zoomies across the whole screen
+  if (r < .74 && !c.friend) { const x = b.x0 + Math.random() * (b.x1 - b.x0), y = b.y0 + Math.random() * (b.y1 - b.y0) * .7; await walkTo(c, x, y, 70); setPose(c, 'sit'); catSpeak(c, 'nice view up here'); await delay(2600); await walkTo(c, x, b.y1, 90); setPose(c, 'sit'); return 3000; }
+  setPose(c, 'sit'); if (r < .85) catSpeak(c, c.friend ? pick(['mew?', '*yawn*', 'prrp']) : petLine()); return 4500 + Math.random() * 3500;
 }
+async function tickCat(c){
+  clearTimeout(c.loop); if (!catShown(c)) return;
+  if (c.busy) { c.loop = setTimeout(() => tickCat(c), 1500); return; }
+  c.busy = true; let w = 5000;
+  try { w = await wander(c); } catch(e){}
+  c.busy = false; c.loop = setTimeout(() => tickCat(c), w);
+}
+
+/* together: they meet, chase, nap, groom and play */
+const alive = tok => tok === petEvt && S.pet.on && S.pet.friend.on;
+const groundY = c => bounds(c).y1;
+const evMid = () => { const b = bounds(CATS[0]); return clampN(160 + Math.random() * (innerWidth - 320), b.x0 + 70, b.x1 - 70); };
+async function evMeet(tok){
+  const [a, f] = CATS, mx = evMid(), gap = catW(a) * .9;
+  await Promise.all([walkTo(a, mx - gap, groundY(a), 85), walkTo(f, mx + gap * .2, groundY(f), 85)]);
+  if (!alive(tok)) return; face(a, 1); face(f, -1); setPose(a, 'sit'); setPose(f, 'sit'); catSpeak(a, 'mrrp?'); catSpeak(f, 'mew!'); await delay(1300); if (!alive(tok)) return;
+  setPose(a, 'happy'); setPose(f, 'happy'); heartsAt(mx + 6, groundY(a) - 6, 5); catSpeak(a, 'boop! 💕'); catSpeak(f, '*nose boop*'); await delay(2200);
+}
+async function evChase(tok){
+  const [a, f] = CATS; catSpeak(f, 'catch me!'); await delay(700);
+  for (let i = 0; i < 3 && alive(tok); i++) {
+    const b = bounds(a), x = b.x0 + Math.random() * (b.x1 - b.x0), y = b.y1 - Math.random() * 90;
+    await Promise.all([walkTo(f, x, y, 160), (async () => { await delay(450); await walkTo(a, x + (x > innerWidth / 2 ? 60 : -60), y, 150); })()]);
+  }
+  if (!alive(tok)) return; setPose(a, 'sit'); setPose(f, 'sit'); catSpeak(a, 'phew…'); catSpeak(f, 'good game!'); heartsAt(f.x + 20, f.y, 3); await delay(2200);
+}
+async function evNap(tok){
+  const [a, f] = CATS, mx = evMid(), gap = catW(a) * .85;
+  await Promise.all([walkTo(a, mx, groundY(a), 85), walkTo(f, mx + gap, groundY(f), 85)]); if (!alive(tok)) return;
+  setPose(a, 'sleep'); setPose(f, 'sleep'); heartsAt(mx + gap / 2 + 14, groundY(a) - 8, 3); catSpeak(a, 'zzz…'); catSpeak(f, 'zzz… 💤');
+  for (let i = 0; i < 14 && alive(tok); i++) { await delay(1000); if (i === 6) heartsAt(mx + gap / 2 + 14, groundY(a) - 8, 2); if (Date.now() - petIdleAt < 1200 && i > 2) break; }
+  if (alive(tok)) { setPose(a, 'sit'); setPose(f, 'sit'); catSpeak(a, '*stretch*'); }
+}
+async function evGroom(tok){
+  const [a, f] = CATS, mx = evMid(), gap = catW(a) * .8;
+  await Promise.all([walkTo(a, mx - gap / 2, groundY(a), 85), walkTo(f, mx + gap / 2, groundY(f), 85)]); if (!alive(tok)) return;
+  face(a, 1); face(f, -1); setPose(f, 'sit'); setPose(a, 'groom'); catSpeak(a, '*lick lick*'); heartsAt(mx + 10, groundY(a) - 4, 3); await delay(2600); if (!alive(tok)) return;
+  setPose(a, 'sit'); setPose(f, 'groom'); catSpeak(f, '*lick lick*'); heartsAt(mx + 10, groundY(a) - 4, 3); await delay(2600);
+}
+async function evPlay(tok){
+  const [a, f] = CATS, mx = evMid(), gap = catW(a) * 1.1;
+  await Promise.all([walkTo(a, mx - gap, groundY(a), 85), walkTo(f, mx + gap * .3, groundY(f), 85)]); if (!alive(tok)) return;
+  face(a, 1); face(f, -1); setPose(a, 'happy'); setPose(f, 'happy'); catSpeak(a, 'wheee!'); catSpeak(f, 'yay!'); heartsAt(mx, groundY(a) - 10, 4); await delay(1700);
+  if (!alive(tok)) return; setPose(a, 'happy'); setPose(f, 'happy'); await delay(1500);
+}
+async function runEvent(force){
+  clearTimeout(petEvtT); if (!(S.pet.on && S.pet.friend.on)) return;
+  const [a, f] = CATS;
+  if (!force && (S.timer || nightIdle() || a.busy || f.busy || a.pose === 'sleep' || !$('#petCard').hidden)) { petEvtT = setTimeout(runEvent, 8000); return; }
+  if (a.busy || f.busy) return;
+  const tok = ++petEvt; a.busy = f.busy = true;
+  try { await (force || pick([evMeet, evChase, evNap, evGroom, evPlay, evMeet]))(tok); } catch(e){}
+  a.busy = f.busy = false; if (alive(tok)) { setPose(a, 'sit'); setPose(f, 'sit'); }
+  petEvtT = setTimeout(runEvent, 20000 + Math.random() * 25000);
+}
+function friendClick(f){
+  petIdleAt = Date.now(); const a = CATS[0]; heartsOn(f, 2); catSpeak(f, pick(['mew!', 'hi hi!', '*purr*']));
+  if (!a.busy && !f.busy && !S.timer) runEvent(evMeet);
+}
+
+/* pet card: name, mood, treats, friend */
 function openPetCard(editing){
   const c = $('#petCard'); c.hidden = false; renderPetCard(editing);
-  const r = $('#petBtn').getBoundingClientRect(); c.style.left = Math.max(8, Math.min(innerWidth - 274, r.left - 100)) + 'px';
-  resetCardTimer();
-  if (editing) $('#pcIn')?.focus();
+  const r = CATS[0].btn.getBoundingClientRect(); c.style.left = clampN(r.left - 100, 8, innerWidth - 274) + 'px';
+  resetCardTimer(); if (editing) $('#pcIn, #pcFrIn')?.focus();
 }
 function closePetCard(){ $('#petCard').hidden = true; clearTimeout(petCardT); }
 function resetCardTimer(){ clearTimeout(petCardT); petCardT = setTimeout(() => { if (!$('#petCard').matches(':hover') && !$('#petCard').contains(document.activeElement)) closePetCard(); else resetCardTimer(); }, 9000); }
 function renderPetCard(editing){
-  const p = S.pet, st = petStage(), next = STAGE_AT[st + 1], f = Math.round(p.love / 20);
-  $('#pcHead').innerHTML = editing
+  const p = S.pet, st = petStage(), next = STAGE_AT[st + 1], f = Math.round(p.love / 20), fr = p.friend;
+  $('#pcHead').innerHTML = editing === 'pet'
     ? `<input id="pcIn" maxlength="16" placeholder="Give your cat a name" value="${esc(p.name)}" autocomplete="off" aria-label="Cat name"><button class="cta" id="pcSave" type="button">Save</button>`
     : `<b>${esc(petName())}</b><button class="pcr" id="pcRename" type="button">✎ ${p.name ? 'Rename' : 'Name it'}</button>`;
   $('#pcSt').textContent = `${STAGES[st]} · level ${st + 1}`;
   $('#pcLove').textContent = '♥'.repeat(f) + '♡'.repeat(5 - f);
-  $('#pcMeta').innerHTML = `🐟 ${p.treats} treat${p.treats === 1 ? '' : 's'} · ${p.done} task${p.done === 1 ? '' : 's'} done${next ? `<br>${next - p.done} more to become a ${STAGES[st + 1]}` : '<br>fully grown & fancy 👑'}<br>no upkeep — it naps when you’re away`;
+  $('#pcMeta').innerHTML = `🐟 ${p.treats} treat${p.treats === 1 ? '' : 's'} · ${p.done} task${p.done === 1 ? '' : 's'} done${next ? `<br>${next - p.done} more to become a ${STAGES[st + 1]}` : '<br>fully grown & fancy 👑'}`;
+  $('#pcFr').innerHTML = !fr.on ? `<span>No friend visiting</span><button class="btn sm" id="pcFrToggle" type="button">Invite a friend</button>`
+    : editing === 'friend' ? `<input id="pcFrIn" maxlength="16" value="${esc(fr.name)}" autocomplete="off" aria-label="Friend's name"><button class="cta sm" id="pcFrSave" type="button">Save</button>`
+    : `<span>🧡 Friend: <b>${esc(fr.name)}</b></span><span><button class="pcr" id="pcFrRename" type="button">✎</button> <button class="pcr" id="pcFrToggle" type="button">Send home</button></span>`;
 }
-async function savePetName(){
-  const v = $('#pcIn').value.trim().slice(0, 16); if (!v) { toast('Give your cat a name'); return $('#pcIn').focus(); }
-  const old = S.pet.name;
+async function savePetName(kind){
+  const friend = kind === 'friend', inp = $(friend ? '#pcFrIn' : '#pcIn'), v = inp.value.trim().slice(0, 16);
+  if (!v) { toast('Give your cat a name'); return inp.focus(); }
+  const old = friend ? S.pet.friend.name : S.pet.name;
   if (old === v) { renderPetCard(false); return toast('No changes to save'); }
-  if (old && !await ask({title:'Rename your cat?', body:nameCh(old, v), ok:'Yes, rename'})) return;
-  S.pet.name = v; S.pet.asked = true; save(); renderPetCard(false); resetCardTimer();
-  notify(old ? `Cat ${q(old)} has been renamed to ${q(v)}` : `Your cat is now called ${q(v)}`); petSay(`${v}! I like it 😸`);
+  if (old && !await ask({title:friend ? 'Rename the friend cat?' : 'Rename your cat?', body:nameCh(old, v), ok:'Yes, rename'})) return;
+  if (friend) S.pet.friend.name = v; else { S.pet.name = v; S.pet.asked = true; }
+  save(); renderPetCard(false); resetCardTimer();
+  notify(old ? `Cat ${q(old)} has been renamed to ${q(v)}` : `Your cat is now called ${q(v)}`); catSpeak(CATS[friend ? 1 : 0], `${v}! I like it 😸`);
 }
-$('#petBtn').onclick = () => { petIdleAt = Date.now(); petReact('pet'); openPetCard(false); };
 $('#petCard').addEventListener('click', e => {
   const id = e.target.closest('button')?.id; resetCardTimer();
-  if (id === 'pcRename') { renderPetCard(true); $('#pcIn').focus(); $('#pcIn').select(); }
-  if (id === 'pcSave') savePetName();
-  if (id === 'pcFeed') { petReact('feed'); renderPetCard(!!$('#pcIn')); }
+  if (id === 'pcRename') { renderPetCard('pet'); $('#pcIn').focus(); $('#pcIn').select(); }
+  if (id === 'pcSave') savePetName('pet');
+  if (id === 'pcFrRename') { renderPetCard('friend'); $('#pcFrIn').focus(); $('#pcFrIn').select(); }
+  if (id === 'pcFrSave') savePetName('friend');
+  if (id === 'pcFrToggle') setFriendOn(!S.pet.friend.on);
+  if (id === 'pcFeed') { petReact('feed'); renderPetCard(); }
   if (id === 'pcHide') setPetOn(false);
 });
-$('#petCard').addEventListener('keydown', e => { if (e.target.id === 'pcIn' && e.key === 'Enter' && !e.isComposing) { e.preventDefault(); savePetName(); } if (e.target.id === 'pcIn' && e.key === 'Escape') { e.stopPropagation(); renderPetCard(false); } });
+$('#petCard').addEventListener('keydown', e => {
+  const id = e.target.id; if (id !== 'pcIn' && id !== 'pcFrIn') return;
+  if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); savePetName(id === 'pcIn' ? 'pet' : 'friend'); }
+  if (e.key === 'Escape') { e.stopPropagation(); renderPetCard(false); }
+});
 $('#petCard').addEventListener('mouseenter', () => clearTimeout(petCardT)); $('#petCard').addEventListener('mouseleave', resetCardTimer);
+
+/* on / off */
+function applyPet(entrance){
+  const on = S.pet.on, f = CATS[1];
+  petEvt++; clearTimeout(petEvtT);
+  CATS.forEach(c => { c.busy = false; clearTimeout(c.loop); c.el.hidden = !catShown(c); });
+  $('#petToggle').classList.toggle('on', on); $('#petToggle').title = on ? 'Hide your cat' : 'Show your cat';
+  $('#petToggle2').textContent = on ? '🐾 Hide cat' : '🐾 Show cat';
+  if (!on) return;
+  CATS.forEach(c => {
+    if (!catShown(c)) return; const b = bounds(c);
+    if (!c.placed) { place(c, c.friend ? b.x1 * .72 : b.x1 * .2, b.y1); c.placed = true; }
+    else place(c, c.x, c.y);
+    setPose(c, S.timer && !c.friend ? 'focus' : 'sit'); c.loop = setTimeout(() => tickCat(c), 1500 + Math.random() * 2500);
+  });
+  if (entrance && catShown(f)) { const t = f.x; f.el.hidden = false; face(f, -1); place(f, innerWidth + 30, bounds(f).y1); f.el.style.transform = `translate(${f.x}px,${f.y}px)`; setTimeout(() => { f.busy = true; walkTo(f, t, bounds(f).y1, 60).then(() => { f.busy = false; setPose(f, 'sit'); catSpeak(f, 'hi! I’m ' + S.pet.friend.name + ' 🧡'); }); }, 60); }
+  if (S.pet.friend.on) petEvtT = setTimeout(runEvent, 9000);
+}
 function setPetOn(on){
   S.pet.on = on; save(); applyPet(); closePetCard();
   if (on) { notify(S.pet.name ? `${S.pet.name} is back! 🐾` : 'Your cat has moved in 🐾'); setTimeout(() => petSay(S.pet.name ? `hi, it’s ${S.pet.name} 😺` : 'hi! give me a name? 😺'), 500); }
   else notify(`${petName()} went off to nap. Tap 🐾 to bring them back.`);
 }
-function applyPet(){
-  const on = S.pet.on;
-  $('#pet').hidden = !on;
-  ['#petToggle'].forEach(i => $(i).classList.toggle('on', on)); $('#petToggle').title = on ? 'Hide your cat' : 'Show your cat';
-  $('#petToggle2').textContent = on ? '🐾 Hide cat' : '🐾 Show cat';
-  clearTimeout(petLoop);
-  if (on) {
-    const [a, b] = petRange(); petX = Math.min(Math.max(petX || a + (b - a) * .4, a), b); $('#pet').style.left = petX + 'px'; setPose(S.timer ? 'focus' : 'sit');
-    petLoop = setTimeout(petTick, 2500);
-  }
+function setFriendOn(on){
+  S.pet.friend.on = on; save(); const keep = !$('#petCard').hidden; applyPet(on); if (keep) renderPetCard();
+  notify(on ? `${S.pet.friend.name} has come to visit! 🧡` : `${S.pet.friend.name} went home.`);
 }
 $('#petToggle').onclick = $('#petToggle2').onclick = () => setPetOn(!S.pet.on);
-['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { petIdleAt = Date.now(); if (petPose === 'sleep' && S.pet.on) { const h = new Date().getHours(); if (h < 23 && h >= 6) setPose('sit'); } }, {passive:true}));
-addEventListener('resize', () => { if (S.pet.on) { const [a, b] = petRange(); petX = Math.min(Math.max(petX, a), b); $('#pet').style.left = petX + 'px'; } });
-applyPet();
-if (S.pet.on && !S.pet.name && !S.pet.asked) setTimeout(() => { if (S.pet.on && !S.pet.name) { S.pet.asked = true; save(); openPetCard(true); petSay('hi! what should you call me? 😺', 6000); } }, 1800);
+['pointerdown', 'keydown'].forEach(ev => addEventListener(ev, () => { petIdleAt = Date.now(); CATS.forEach(c => { if (c.pose === 'sleep' && catShown(c) && !c.busy && !nightIdle()) setPose(c, 'sit'); }); }, {passive:true}));
+addEventListener('resize', () => CATS.forEach(c => { if (c.placed) place(c, c.x, c.y); }));
+mkCat(false); mkCat(true); applyPet();
+if (S.pet.on && S.pet.friend.on && !S.pet.friend.seen) setTimeout(() => { S.pet.friend.seen = true; save(); notify(`${S.pet.friend.name}, a friendly orange cat, dropped by! 🧡`); }, 1500);
+if (S.pet.on && !S.pet.name && !S.pet.asked) setTimeout(() => { if (S.pet.on && !S.pet.name) { S.pet.asked = true; save(); openPetCard('pet'); petSay('hi! what should you call me? 😺', 6000); } }, 1800);
 
 /* ---------- theme (dark brown / cream, from the brand kit) ---------- */
 function pattern(stroke){
