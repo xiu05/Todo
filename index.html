@@ -298,17 +298,29 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 .pcat.walk,.pcat.run{transition:transform var(--dur,3s) linear}
 .pbtn{pointer-events:auto;display:block;color:var(--ink);width:var(--w,60px);transform:scaleX(var(--dir,1));cursor:pointer}
 .pbtn svg{width:100%;display:block;overflow:visible}
-.pcat.walk .pbtn svg{animation:waddle .45s ease-in-out infinite}
-.pcat.run .pbtn svg{animation:waddle .22s ease-in-out infinite}
-@keyframes waddle{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-3px)}}
-.pcat.happy .pbtn svg{animation:hop .45s ease-out 3}
 @keyframes hop{50%{transform:translateY(-18px)}}
-.pcat.sleep .pbtn svg{transform:translateY(6px) scaleY(.93)}
-.ptail{transform-origin:56px 62px;animation:wag 3s ease-in-out infinite}
+.pcat.happy .pbtn svg{animation:hop .45s ease-out 3}
+.pcat .pfar{opacity:.5}
+.pcat.walk .legA{animation:swingA .62s ease-in-out infinite} .pcat.walk .legB{animation:swingB .62s ease-in-out infinite}
+.pcat.run .legA{animation:swingA .3s ease-in-out infinite} .pcat.run .legB{animation:swingB .3s ease-in-out infinite}
+@keyframes swingA{0%,100%{transform:rotate(28deg)}50%{transform:rotate(-28deg)}}
+@keyframes swingB{0%,100%{transform:rotate(-28deg)}50%{transform:rotate(28deg)}}
+.pcat.walk .pbody{animation:bob2 .31s ease-in-out infinite} .pcat.run .pbody{animation:bob2 .15s ease-in-out infinite}
+@keyframes bob2{50%{transform:translateY(-2px)}}
+.ptail{animation:tailw 3s ease-in-out infinite} .pcat.walk .ptail,.pcat.run .ptail{animation:tailw .8s ease-in-out infinite}
+@keyframes tailw{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(8deg)}}
+.pcat.sleep .ptail{animation:none}
+.pcat.eat .chew{animation:chew .45s ease-in-out infinite} @keyframes chew{50%{transform:translateY(2px) rotate(3deg)}}
+.pcat.play .rock{animation:rockp .8s ease-in-out infinite} @keyframes rockp{50%{transform:rotate(-3deg)}}
+.pcat.play .swat{animation:swat .4s ease-in-out infinite} @keyframes swat{50%{transform:rotate(-26deg)}}
+.pcat.play .ball{animation:ballr .8s ease-in-out infinite} @keyframes ballr{0%,100%{transform:translate(0,0)}50%{transform:translate(4px,-7px)}}
+.pcat.groom .lick{animation:lickp .5s ease-in-out infinite} @keyframes lickp{50%{transform:rotate(-22deg)}}
+.pcat.sleep .pbtn svg{animation:breathe 3.2s ease-in-out infinite} @keyframes breathe{50%{transform:scaleY(1.04)}}
+.pbtn svg{transform-origin:50% 100%}
 .peyes circle{animation:blink 5s infinite;transform-box:fill-box;transform-origin:center}
 .pcat .pfill{fill:var(--card)}
 .pcat.friend .pfill{fill:color-mix(in srgb,var(--orange) 42%,var(--card))}
-.pcat .pzz{font:500 13px var(--mono);fill:var(--muted);animation:zz 2.4s ease-in-out infinite}
+.pcat .pzz{font:500 11px var(--mono);fill:var(--muted);animation:zz 2.4s ease-in-out infinite}
 .pbub{position:absolute;bottom:100%;left:50%;transform:translate(-50%,8px);margin-bottom:4px;background:var(--ink);color:var(--card);font:500 12px/1.3 var(--mono);padding:7px 11px;border-radius:12px 12px 12px 3px;
   width:max-content;max-width:200px;opacity:0;transition:.25s;pointer-events:none;text-align:left}
 .pbub.on{opacity:1;transform:translate(-50%,0)}
@@ -339,6 +351,10 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 #timerPill[hidden]{display:none}
 #timerPill .rec{width:9px;height:9px;border-radius:50%;background:var(--red);animation:pulse 1.6s ease-in-out infinite}
 #tpName{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.7;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+#timerPill.brk .rec{background:var(--green)} #timerPill.brk{background:color-mix(in srgb,var(--green) 55%,var(--ink))}
+#tpPhase{font-size:11px;opacity:.85;white-space:nowrap}
+#tpSkip{color:var(--card);opacity:.8;font-size:12px;width:24px;height:26px;text-align:center} #tpSkip:hover{opacity:1}
+.chipb.pomo{border-color:var(--red);color:var(--red)}
 #tpStop{width:26px;height:26px;border-radius:50%;background:var(--red);color:var(--card);text-align:center;font-size:10px}
 .tlog{margin:10px 8px 0}
 .tlog summary{cursor:pointer;color:var(--muted);font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;list-style:none}
@@ -540,7 +556,7 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   <div class="pc-fr" id="pcFr"></div>
   <div class="pc-act"><button class="cta" id="pcFeed" type="button">Give treat 🐟</button><button class="btn" id="pcHide" type="button">Hide cat</button></div>
 </div>
-<div id="timerPill" hidden role="timer"><i class="rec"></i><span id="tpTime">00:00:00</span><span id="tpName"></span><button id="tpStop" aria-label="Stop timer" title="Stop timer">■</button></div>
+<div id="timerPill" hidden role="timer"><i class="rec"></i><span id="tpTime">00:00:00</span><span id="tpPhase"></span><span id="tpName"></span><button id="tpSkip" hidden aria-label="Skip to next phase" title="Skip to next phase">⏭</button><button id="tpStop" aria-label="Stop timer" title="Stop timer">■</button></div>
 <button id="musicBtn" aria-label="Music"><span class="vin"></span><b>♪</b></button>
 <section id="music" aria-label="Work music" aria-hidden="true">
   <div class="mh mono"><span>Work music</span><button id="mClose" aria-label="Close music">✕</button></div>
@@ -655,6 +671,7 @@ S.pet = Object.assign({on:true, name:'', love:30, treats:0, done:0, seeded:false
 S.pet.friend = Object.assign({on:true, name:'Pudding', seen:false}, S.pet.friend || {});
 if (!S.pet.seeded) { S.tasks.forEach(t => { if (t.done) { t.credited = true; S.pet.done++; } }); S.pet.seeded = true; }
 S.projects.forEach(p => { p.sessions = p.sessions || []; });
+S.pomoSet = Object.assign({on:false, f:25, b:5, l:15, every:4}, S.pomoSet || {});
 if (S.timer && !S.projects.some(p => p.id === S.timer.pid)) S.timer = null;
 if (S.brand !== '+' && !S.brands.some(b => b.id === S.brand)) S.brand = S.brands[0]?.id || '+';
 S.adding = false; S.edit = null;
@@ -839,6 +856,7 @@ function cardBrand(b){
           <label class="st s-${p.status}" title="Project status"><i></i><span>${stLabel(p.status, PST)}</span><select data-a="pstatus" aria-label="Project status">${opts(p.status, PST)}</select></label>
           <button class="chipb ${p.due ? 'set' : ''}" data-a="pdue">⚑ ${p.due ? 'Due ' + fmt(p.due) : 'Set deadline'}</button>
           <button class="tbtn lg ${run ? 'on' : ''}" data-a="timer">${run ? `■ Stop · <span class="ttime" data-pid="${p.id}" data-clock>${clock(tot)}</span>` : '▶ Start timer'}</button>
+          <button class="chipb ${S.pomoSet.on ? 'pomo' : ''}" data-a="pomo" title="Pomodoro: focus / break cycles">🍅 ${S.pomoSet.on ? `${S.pomoSet.f}·${S.pomoSet.b}` : 'Pomodoro off'}</button>
           <span class="sp"></span>
           ${S.edit && S.edit.k === 'proj' && S.edit.id === p.id ? '<button class="btn pri" data-a="rensave">Save</button><button class="btn" data-a="rencancel">Cancel</button>' : '<button class="lnk" data-a="renp">Rename</button><button class="lnk dng" data-a="delp">Delete</button>'}
         </div>
@@ -991,34 +1009,58 @@ addEventListener('resize', () => renderStage());
 /* ---------- timer: start/stop per project, time log, manual time ---------- */
 const clock = ms => `${pad(Math.floor(ms / 3600000))}:${pad(Math.floor(ms % 3600000 / 60000))}:${pad(Math.floor(ms % 60000 / 1000))}`;
 const fmtDur = ms => { const t = Math.floor(ms / 1000), h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60); return h ? `${h}h ${pad(m)}m` : m ? `${m}m` : `${t}s`; };
-const projMs = p => (p.sessions || []).reduce((a, x) => a + (x.e - x.s), 0) + (S.timer && S.timer.pid === p.id ? Date.now() - S.timer.s : 0);
+const projMs = p => (p.sessions || []).reduce((a, x) => a + (x.e - x.s), 0) + (S.timer && S.timer.pid === p.id && liveFocus() ? Date.now() - S.timer.s : 0);
+const liveFocus = () => S.timer && (!S.timer.pomo || S.timer.pomo.phase === 'focus');
+const inFocus = () => !!liveFocus();
+const mmss = ms => { ms = Math.max(0, ms); const m = Math.floor(ms / 60000); return `${pad(m)}:${pad(Math.floor(ms % 60000 / 1000))}`; };
+const pomoLen = P => (P.phase === 'focus' ? P.f : P.phase === 'long' ? P.l : P.b) * 60000;
+const POMO_PRESETS = [null, {f:25, b:5, l:15}, {f:50, b:10, l:30}, {f:15, b:3, l:10}];
+function chime(){ try { const A = window.AudioContext || window.webkitAudioContext, c = new A(); [660, 880, 1100].forEach((f, i) => { const o = c.createOscillator(), g = c.createGain(); o.frequency.value = f; o.connect(g); g.connect(c.destination); const t = c.currentTime + i * .16; g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.18, t + .02); g.gain.exponentialRampToValueAtTime(.0001, t + .15); o.start(t); o.stop(t + .16); }); setTimeout(() => c.close(), 900); } catch(e){} }
 const hm = t => { const d = new Date(t); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 function startTimer(pid){
   const was = S.timer && projOf(S.timer.pid); if (S.timer) stopTimer(true);
-  S.timer = {pid, s:Date.now()}; save(); render(); tickTimer();
-  toast(was && was.id !== pid ? `Switched timer → ${q(projOf(pid).name)}` : `Timer started — ${q(projOf(pid).name)}`);
+  const now = Date.now(); S.timer = {pid, s:now}; if (S.pomoSet.on) S.timer.pomo = {phase:'focus', ps:now, n:0, f:S.pomoSet.f, b:S.pomoSet.b, l:S.pomoSet.l, every:S.pomoSet.every};
+  save(); render(); tickTimer();
+  toast(S.timer.pomo ? `🍅 Pomodoro started — ${S.timer.pomo.f} min focus on ${q(projOf(pid).name)}` : was && was.id !== pid ? `Switched timer → ${q(projOf(pid).name)}` : `Timer started — ${q(projOf(pid).name)}`);
   petReact('timer');
 }
 function stopTimer(silent){
-  if (!S.timer) return; const {pid, s: st} = S.timer, e = Date.now(), p = projOf(pid); S.timer = null;
-  if (p && e - st >= 1000) { (p.sessions = p.sessions || []).push({s:st, e}); if (!silent) { toast(`Logged ${fmtDur(e - st)} on ${q(p.name)}`); petReact('timerStop', fmtDur(e - st)); } }
+  if (!S.timer) return; const {pid, s: st} = S.timer, e = Date.now(), p = projOf(pid), wasFocus = !!liveFocus(), pomo = !!S.timer.pomo; S.timer = null;
+  if (p && wasFocus && e - st >= 1000) { (p.sessions = p.sessions || []).push(pomo ? {s:st, e, pomo:true} : {s:st, e}); if (!silent) { toast(`Logged ${fmtDur(e - st)} on ${q(p.name)}`); petReact('timerStop', fmtDur(e - st)); } }
+  else if (!silent) petReact('timerStop');
   save(); render(); tickTimer();
 }
+function pomoStep(t, endAt){
+  const P = t.pomo;
+  if (P.phase === 'focus') { const p = projOf(t.pid); if (p && endAt - t.s >= 1000) (p.sessions = p.sessions || []).push({s:t.s, e:endAt, pomo:true}); P.n++; P.phase = P.n % (P.every || 4) === 0 ? 'long' : 'break'; P.ps = endAt; }
+  else { P.phase = 'focus'; P.ps = endAt; t.s = endAt; }
+}
+function pomoAnnounce(){
+  const P = S.timer.pomo, p = projOf(S.timer.pid); chime();
+  if (P.phase === 'focus') { notify(`🍅 Focus time — ${P.f} minutes on ${q(p.name)}`); petReact('timer'); }
+  else { notify(P.phase === 'long' ? `🌴 Long break — ${P.l} minutes. ${P.n} pomodoros done!` : `☕ Break time — ${P.b} minutes. Nice focus!`); petReact('break'); }
+}
+function pomoSkip(){ const t = S.timer; if (!t || !t.pomo) return; pomoStep(t, Date.now()); save(); render(); tickTimer(); pomoAnnounce(); }
 function tickTimer(){
   const pill = $('#timerPill'), t = S.timer, p = t && projOf(t.pid);
   pill.hidden = !p;
   if (!p) { document.title = 'Purrgress · Plan · Focus · Achieve'; return; }
-  const ms = Date.now() - t.s;
-  $('#tpTime').textContent = clock(ms); $('#tpName').textContent = p.name;
-  document.title = `⏱ ${clock(ms)} · ${p.name}`;
+  const P = t.pomo; let changed = false;
+  if (P) { for (let g = 0; g < 12 && Date.now() >= P.ps + pomoLen(P); g++) { pomoStep(t, P.ps + pomoLen(P)); changed = true; } if (changed) { save(); render(); pomoAnnounce(); } }
+  const ms = Date.now() - t.s, brk = P && P.phase !== 'focus';
+  $('#timerPill').classList.toggle('brk', !!brk); $('#tpSkip').hidden = !P;
+  $('#tpTime').textContent = P ? mmss(pomoLen(P) - (Date.now() - P.ps)) : clock(ms);
+  $('#tpPhase').textContent = P ? (P.phase === 'focus' ? `🍅 ${P.n % (P.every || 4) + 1}/${P.every || 4}` : P.phase === 'long' ? '🌴 long break' : '☕ break') : '';
+  $('#tpName').textContent = p.name;
+  document.title = P ? `${brk ? '☕' : '🍅'} ${mmss(pomoLen(P) - (Date.now() - P.ps))} · ${p.name}` : `⏱ ${clock(ms)} · ${p.name}`;
   document.querySelectorAll('.ttime').forEach(el => { const pp = projOf(el.dataset.pid); if (pp) el.textContent = 'clock' in el.dataset ? clock(projMs(pp)) : '⏱ ' + fmtDur(projMs(pp)); });
 }
 setInterval(tickTimer, 1000);
-$('#tpStop').onclick = () => stopTimer();
+$('#tpStop').onclick = () => stopTimer(); $('#tpSkip').onclick = pomoSkip;
 function tlogHTML(p){
   const ss = p.sessions || [], tot = projMs(p);
   return `<details class="tlog" data-pid="${p.id}" ${S.tlog === p.id ? 'open' : ''}><summary>Time log · ${ss.length} session${ss.length === 1 ? '' : 's'} · ${fmtDur(tot)} total</summary>
-    ${ss.length ? [...ss.keys()].reverse().slice(0, 20).map(i => `<div class="ts" data-i="${i}"><span>${fmtLong(iso(new Date(ss[i].s)))} · ${hm(ss[i].s)}–${hm(ss[i].e)}</span><b>${fmtDur(ss[i].e - ss[i].s)}</b><button class="mx" data-a="tdel" aria-label="Delete time entry">×</button></div>`).join('') : '<div class="ts">No time logged yet. Press ▶ to start.</div>'}
+    ${ss.length ? [...ss.keys()].reverse().slice(0, 20).map(i => `<div class="ts" data-i="${i}"><span>${ss[i].pomo ? '🍅 ' : ''}${fmtLong(iso(new Date(ss[i].s)))} · ${hm(ss[i].s)}–${hm(ss[i].e)}</span><b>${fmtDur(ss[i].e - ss[i].s)}</b><button class="mx" data-a="tdel" aria-label="Delete time entry">×</button></div>`).join('') : '<div class="ts">No time logged yet. Press ▶ to start.</div>'}
     <div class="tman" data-pid="${p.id}"><input placeholder="Add time manually — e.g. 45m or 1h30" autocomplete="off" aria-label="Add time manually"><button class="btn" data-a="tadd">+ Add</button></div></details>`;
 }
 function parseDur(v){
@@ -1116,6 +1158,7 @@ $('#card').addEventListener('click', e => {
   }
   const pid = e.target.closest('.trk')?.dataset.pid;
   if (e.target.closest('.ptool .st')) return;
+  if (a === 'pomo') { const cur = S.pomoSet.on ? POMO_PRESETS.findIndex(x => x && x.f === S.pomoSet.f && x.b === S.pomoSet.b) : 0, nx = POMO_PRESETS[(cur + 1) % POMO_PRESETS.length]; S.pomoSet = nx ? {...S.pomoSet, on:true, ...nx} : {...S.pomoSet, on:false}; save(); render(); return toast(nx ? `Pomodoro on — ${nx.f} min focus, ${nx.b} min break (applies to the next timer you start)` : 'Pomodoro off — plain stopwatch'); }
   if (a === 'timer') return S.timer && S.timer.pid === pid ? stopTimer() : startTimer(pid);
   if (a === 'tadd') { const box = e.target.closest('.tman'), i = box.querySelector('input'), ms = parseDur(i.value); if (!ms) { toast('Try 45m, 1h30 or 1.5h'); return i.focus(); }
     const p = projOf(box.dataset.pid), now = Date.now(); (p.sessions = p.sessions || []).push({s:now - ms, e:now, manual:true}); S.tlog = p.id; save(); render(); return toast(`Added ${fmtDur(ms)} to ${q(p.name)}`); }
@@ -1567,24 +1610,47 @@ const delay = ms => new Promise(res => setTimeout(res, ms));
 const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
 const CATS = []; let petEvt = 0, petEvtT = 0, petIdleAt = Date.now(), petCardT = 0, petQuick = 0;
 function petSVG(pose, stage, friend){
-  const eyes = pose === 'sleep' ? '<path d="M29 31q4 4 8 0M43 31q4 4 8 0" stroke-width="2.6"/>'
-    : pose === 'happy' || pose === 'groom' ? '<path d="M29 32q4-5 8 0M43 32q4-5 8 0" stroke-width="2.8"/>'
-    : pose === 'focus' ? '<path d="M29 31h8M43 31h8" stroke-width="2.8"/>'
-    : '<g class="peyes"><circle cx="33" cy="30" r="2.6" fill="currentColor" stroke="none"/><circle cx="47" cy="30" r="2.6" fill="currentColor" stroke="none"/></g>';
-  return `<svg viewBox="0 0 80 72" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <g class="ptail"><path d="M56 62C70 62 75 48 67 43"/>${friend ? '<path d="M64 55l5-2M68 48l5-3" stroke-width="2.2"/>' : ''}</g>
-    <path class="pfill" d="M24 66C22 50 30 44 40 44C50 44 58 50 56 66Z"/>
-    <path d="M34 66v-6M46 66v-6" stroke-width="2.4"/>
-    ${pose === 'groom' ? '<path d="M53 52q9-3 6-17" stroke-width="3"/>' : ''}
-    ${!friend && stage >= 1 ? '<path d="M40 47l-8-4v8zM40 47l8-4v8z" fill="var(--orange)" stroke-width="2"/><circle cx="40" cy="47" r="2" fill="currentColor" stroke="none"/>' : ''}
-    <path class="pfill" d="M22 30C20 18 26 10 30 6L36 12Q40 11 44 12L50 6C54 10 60 18 58 30C57 38 50 42 40 42C30 42 23 38 22 30Z"/>
-    ${friend ? '<path d="M36 17v5M40 15v6M44 17v5" stroke-width="2.2"/>' : ''}
-    ${!friend && stage >= 2 ? '<path d="M32 10L33 2L40 7L47 2L48 10Z" fill="var(--yellow)" stroke-width="2"/>' : ''}
-    ${eyes}
-    <path d="M37 36q1.5 2 3 0q1.5 2 3 0" stroke-width="2.2"/>
-    <path d="M22 32l-8-2M22 36l-8 2M58 32l8-2M58 36l8 2" stroke-width="2"/>
-    ${pose === 'sleep' ? '<text class="pzz" x="58" y="12">z</text>' : ''}
-  </svg>`;
+  const sit = ['sit', 'happy', 'focus', 'groom'].includes(pose);
+  const eye = (x, y) => pose === 'sleep' ? `<path d="M${x - 3.5} ${y}q3.5 3.5 7 0" stroke-width="2.2"/>`
+    : (pose === 'happy' || pose === 'groom' || pose === 'play') ? `<path d="M${x - 3.5} ${y + 1}q3.5-5 7 0" stroke-width="2.2"/>`
+    : pose === 'focus' ? `<path d="M${x - 3.5} ${y}h7" stroke-width="2.4"/>`
+    : `<g class="peyes"><circle cx="${x}" cy="${y}" r="2.3" fill="currentColor" stroke="none"/></g>`;
+  const head = (x, y, rot) => `<g class="phead" transform="translate(${x} ${y}) rotate(${rot})">
+      <path class="pfill" d="M-16 2C-16 -10 -8 -16 2 -16C12 -16 18 -9 17 0C16 8 8 12 0 12C-10 12 -16 8 -16 2Z"/>
+      <path class="pfill" d="M-12 -10L-14 -22L-4 -15Z"/><path class="pfill" d="M4 -16L10 -26L15 -12Z"/>
+      ${friend ? '<path d="M-4 -14v5M0 -15v6M4 -14v5" stroke-width="2"/>' : ''}
+      ${eye(2, -2)}${eye(11, -2)}
+      <path d="M15 3l3 0l-1.5 2.2z" fill="currentColor" stroke-width="1.4"/>
+      <path d="M14 7q-2 3-5 2M14 7q2 3 5 2" stroke-width="1.8"/>
+      <path d="M16 5l10-3M16 7l10 3" stroke-width="1.6"/>
+      ${!friend && stage >= 1 ? '<path d="M-5 11l-7-3.5v7zM-5 11l7-3.5v7z" fill="var(--orange)" stroke-width="1.8"/>' : ''}
+      ${!friend && stage >= 2 ? '<path d="M-7 -14L-6 -23L0 -18L6 -23L7 -14Z" fill="var(--yellow)" stroke-width="1.8"/>' : ''}
+    </g>`;
+  const leg = (x, cls, far, extra = '') => `<g class="leg ${cls} ${far ? 'pfar' : ''}" ${extra} style="transform-origin:${x}px 46px"><path d="M${x} 46V62" stroke-width="4.6"/><path d="M${x - 2.5} 63.5h6" stroke-width="3"/></g>`;
+  const tail = (d, ox, oy) => `<g class="ptail" style="transform-origin:${ox}px ${oy}px"><path d="${d}" stroke-width="3.6"/>${friend ? '<path d="M4 20l5-2M2 14l5-3" stroke-width="2"/>' : ''}</g>`;
+  const stripes = friend ? '<path d="M30 21v6M38 21v6M46 22v6" stroke-width="2.2"/>' : '';
+  const body = `<path class="pfill" d="M12 36C12 24 22 20 36 20L58 22C66 24 66 42 58 46L22 48C16 48 12 42 12 36Z"/>${stripes}`;
+  let inner;
+  if (pose === 'walk' || pose === 'run') {
+    inner = `${leg(30, 'legB', true)}${leg(52, 'legA', true)}${tail('M12 32C0 30-3 16 6 8', 12, 32)}${body}${leg(24, 'legA')}${leg(58, 'legB')}${head(76, 25, 0)}`;
+  } else if (pose === 'eat') {
+    inner = `${leg(30, '', true)}${leg(52, '', true)}${tail('M12 32C0 34-4 22 4 14', 12, 32)}${body}${leg(24, '')}${leg(58, '')}
+      <g class="chew">${head(88, 45, 38)}</g>
+      <path class="pfill" d="M84 60h22l-3 9H87z" stroke-width="2.6"/><circle cx="92" cy="59" r="1.8" fill="currentColor" stroke="none"/><circle cx="98" cy="58" r="1.8" fill="currentColor" stroke="none"/><circle cx="103" cy="59.5" r="1.6" fill="currentColor" stroke="none"/>`;
+  } else if (pose === 'play') {
+    inner = `<g class="rock" style="transform-origin:40px 46px">${leg(30, '', true)}${tail('M12 32C0 28-2 14 8 8', 12, 32)}${body}${leg(24, '')}
+      ${leg(52, '', true)}<g class="swat" style="transform-origin:58px 46px"><path d="M58 46L74 55" stroke-width="4.6"/></g>${head(78, 36, 18)}</g>
+      <g class="ball"><circle cx="100" cy="58" r="8" fill="var(--yellow)" stroke-width="2.4"/><path d="M93 56q7 5 14 0M94 62q6 3 11-2" stroke-width="1.6"/></g>`;
+  } else if (pose === 'sleep') {
+    inner = `${tail('M10 60C0 62-2 48 12 50', 12, 56)}<path class="pfill" d="M8 62C6 46 18 38 38 38L66 40C80 42 82 54 78 62Z"/>${friend ? '<path d="M26 40v6M34 39v6M42 39v6" stroke-width="2.2"/>' : ''}${head(66, 48, 10)}<path class="pfill" d="M68 62q4-5 12 0" stroke-width="2.6"/><text class="pzz" x="86" y="30">z</text><text class="pzz" x="96" y="20" style="animation-delay:.9s">z</text>`;
+  } else { // sit / happy / focus / groom
+    inner = `${tail('M16 63C0 66-4 50 8 48', 14, 62)}<path class="pfill" d="M14 64C8 46 16 28 34 24C48 21 58 28 60 40C61 50 60 58 60 64Z"/>${friend ? '<path d="M22 38l9-3M20 46l11-2" stroke-width="2.2"/>' : ''}
+      <path d="M18 62q4-13 16-11M18 64h14" stroke-width="2.4"/>
+      <path d="M55 40V62M64 40V62" stroke-width="3.8"/><path d="M52 63.5h6M61 63.5h6" stroke-width="3"/>
+      ${pose === 'groom' ? '<g class="lick" style="transform-origin:62px 40px"><path d="M62 40L68 24" stroke-width="4.4"/></g>' : ''}
+      ${head(58, 13, pose === 'groom' ? 12 : 0)}`;
+  }
+  return `<svg viewBox="0 0 112 72" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="pbody">${inner}</g></svg>`;
 }
 function mkCat(friend){
   const el = document.createElement('div'); el.className = 'pcat' + (friend ? ' friend' : ''); el.hidden = true; el.id = friend ? 'pet2' : 'pet';
@@ -1594,8 +1660,9 @@ function mkCat(friend){
   c.btn.onclick = () => friend ? friendClick(c) : (petIdleAt = Date.now(), petReact('pet'), openPetCard(false));
   CATS.push(c); return c;
 }
-const catW = c => (c.friend ? 52 : [48, 58, 64][petStage()]) * (innerWidth < 760 ? .9 : 1);
-const catH = c => catW(c) * .9;
+const catBase = c => (c.friend ? 52 : [48, 58, 64][petStage()]) * (innerWidth < 760 ? .9 : 1);
+const catW = c => catBase(c) * 1.55;
+const catH = c => catBase(c) * 1.0;
 const catShown = c => S.pet.on && (!c.friend || S.pet.friend.on);
 const bounds = c => ({x0:8, x1:Math.max(60, innerWidth - catW(c) - 8), y0:96, y1:Math.max(120, innerHeight - catH(c) - 2)});
 const nameOf = c => c.friend ? S.pet.friend.name : petName();
@@ -1633,7 +1700,7 @@ function petLine(){
   if (!open.length && S.tasks.length) pool.push('all clear. nap time?');
   return pick(pool);
 }
-const backToSit = c => { if (['happy', 'groom', 'walk', 'run'].includes(c.pose)) setPose(c, 'sit'); };
+const backToSit = c => { if (['happy', 'groom', 'walk', 'run', 'eat', 'play'].includes(c.pose)) setPose(c, 'sit'); };
 function petReact(kind, extra){
   if (!S.pet.on) return; const [a, f] = CATS, fOn = catShown(f);
   if (kind === 'done') { [a, ...(fOn ? [f] : [])].forEach(c => { setPose(c, 'happy'); heartsOn(c, 2); setTimeout(() => backToSit(c), 1600); }); catSpeak(a, pick(PRAISE)); if (fOn) catSpeak(f, pick(['yay!', 'good job!', 'mew mew!'])); }
@@ -1644,9 +1711,10 @@ function petReact(kind, extra){
   }
   if (kind === 'feed') {
     if (S.pet.treats < 1) return catSpeak(a, 'no treats yet — finish a task to earn one 🐟');
-    S.pet.treats--; S.pet.love = Math.min(100, S.pet.love + 10); save(); [a, ...(fOn ? [f] : [])].forEach(c => { setPose(c, 'happy'); heartsOn(c, 3); setTimeout(() => backToSit(c), 1800); }); catSpeak(a, 'nom nom nom 😻'); if (fOn) catSpeak(f, 'share? 🥺');
+    S.pet.treats--; S.pet.love = Math.min(100, S.pet.love + 10); save(); [a, ...(fOn ? [f] : [])].forEach(c => { setPose(c, 'eat'); heartsOn(c, 3); setTimeout(() => backToSit(c), 3200); }); catSpeak(a, 'nom nom nom 😻'); if (fOn) catSpeak(f, 'share? 🥺');
   }
   if (kind === 'timer') { setPose(a, 'focus'); catSpeak(a, 'focus mode 🎧'); }
+  if (kind === 'break') { [a, ...(fOn ? [f] : [])].forEach(c => { setPose(c, pick(['play', 'eat'])); heartsOn(c, 2); setTimeout(() => backToSit(c), 9000); }); catSpeak(a, 'break time! 🎉'); if (fOn) catSpeak(f, 'play with me!'); }
   if (kind === 'timerStop') { setPose(a, 'sit'); catSpeak(a, extra ? `nice session! ${extra}` : 'welcome back!'); }
 }
 function creditPet(){
@@ -1659,14 +1727,16 @@ function creditPet(){
 const nightIdle = () => { const h = new Date().getHours(); return h >= 23 || h < 6 || Date.now() - petIdleAt > 240000; };
 async function wander(c){
   const b = bounds(c), r = Math.random();
-  if (S.timer) {
+  if (inFocus()) {
     if (!c.friend) { setPose(c, 'focus'); if (r < .35) catSpeak(c, pick(['you’re doing great', 'focus focus focus 🎧', 'I’m watching the clock for you'])); return 9000; }
     const u = CATS[0]; await walkTo(c, u.x + (u.dir > 0 ? -58 : 58), u.y); setPose(c, 'sleep'); return 12000;
   }
   if (nightIdle()) { setPose(c, 'sleep'); return 12000; }
-  if (r < .6) { await walkTo(c, b.x0 + Math.random() * (b.x1 - b.x0), b.y1); setPose(c, 'sit'); return 2500 + Math.random() * 3000; }
-  if (r < .7) { await walkTo(c, c.x < innerWidth / 2 ? b.x1 : b.x0, b.y1, 150); setPose(c, 'sit'); catSpeak(c, 'zoomies!'); return 3000; }   // zoomies across the whole screen
-  if (r < .8 && !c.friend) { const x = b.x0 + Math.random() * (b.x1 - b.x0), y = b.y0 + Math.random() * (b.y1 - b.y0) * .7; await walkTo(c, x, y, 70); setPose(c, 'sit'); catSpeak(c, 'nice view up here'); await delay(2600); await walkTo(c, x, b.y1, 90); setPose(c, 'sit'); return 3000; }
+  if (r < .5) { await walkTo(c, b.x0 + Math.random() * (b.x1 - b.x0), b.y1); setPose(c, 'sit'); return 2500 + Math.random() * 3000; }
+  if (r < .58) { await walkTo(c, c.x < innerWidth / 2 ? b.x1 : b.x0, b.y1, 150); setPose(c, 'sit'); catSpeak(c, 'zoomies!'); return 3000; }   // zoomies across the whole screen
+  if (r < .72) { await walkTo(c, b.x0 + Math.random() * (b.x1 - b.x0), b.y1, 60); setPose(c, 'eat'); catSpeak(c, pick(['nom nom', '*crunch*', 'yum 🐟'])); await delay(4800); setPose(c, 'sit'); return 2500; }
+  if (r < .78) { setPose(c, 'play'); catSpeak(c, pick(['got it!', 'pounce!', '*bat bat*'])); await delay(5200); setPose(c, 'sit'); return 2500; }
+  if (r < .86 && !c.friend) { const x = b.x0 + Math.random() * (b.x1 - b.x0), y = b.y0 + Math.random() * (b.y1 - b.y0) * .7; await walkTo(c, x, y, 70); setPose(c, 'sit'); catSpeak(c, 'nice view up here'); await delay(2600); await walkTo(c, x, b.y1, 90); setPose(c, 'sit'); return 3000; }
   setPose(c, 'sit'); if (r < .85) catSpeak(c, c.friend ? pick(['mew?', '*yawn*', 'prrp']) : petLine()); return 4500 + Math.random() * 3500;
 }
 async function tickCat(c){
@@ -1712,12 +1782,12 @@ async function evPlay(tok){
   const [a, f] = CATS, mx = evMid(), gap = catW(a) * 1.1;
   await Promise.all([walkTo(a, mx - gap, groundY(a), 85), walkTo(f, mx + gap * .3, groundY(f), 85)]); if (!alive(tok)) return;
   face(a, 1); face(f, -1); setPose(a, 'happy'); setPose(f, 'happy'); catSpeak(a, 'wheee!'); catSpeak(f, 'yay!'); heartsAt(mx, groundY(a) - 10, 4); await delay(1700);
-  if (!alive(tok)) return; setPose(a, 'happy'); setPose(f, 'happy'); await delay(1500);
+  if (!alive(tok)) return; await delay(1500);
 }
 async function runEvent(force){
   clearTimeout(petEvtT); if (!(S.pet.on && S.pet.friend.on)) return;
   const [a, f] = CATS;
-  if (!force && (S.timer || nightIdle() || a.busy || f.busy || a.pose === 'sleep' || !$('#petCard').hidden)) { petEvtT = setTimeout(runEvent, 8000); return; }
+  if (!force && (inFocus() || nightIdle() || a.busy || f.busy || a.pose === 'sleep' || !$('#petCard').hidden)) { petEvtT = setTimeout(runEvent, 8000); return; }
   if (a.busy || f.busy) return;
   const tok = ++petEvt; a.busy = f.busy = true;
   try { await (force || pick([evMeet, evChase, evNap, evGroom, evPlay, evMeet]))(tok); } catch(e){}
@@ -1726,7 +1796,7 @@ async function runEvent(force){
 }
 function friendClick(f){
   petIdleAt = Date.now(); const a = CATS[0]; heartsOn(f, 2); catSpeak(f, pick(['mew!', 'hi hi!', '*purr*']));
-  if (!a.busy && !f.busy && !S.timer) runEvent(evMeet);
+  if (!a.busy && !f.busy && !inFocus()) runEvent(evMeet);
 }
 
 /* pet card: name, mood, treats, friend */
@@ -1788,7 +1858,7 @@ function applyPet(entrance){
     if (!catShown(c)) return; const b = bounds(c);
     if (!c.placed) { place(c, c.friend ? b.x1 * .72 : b.x1 * .2, b.y1); c.placed = true; }
     else place(c, c.x, c.y);
-    setPose(c, S.timer && !c.friend ? 'focus' : 'sit'); c.loop = setTimeout(() => tickCat(c), 1500 + Math.random() * 2500);
+    setPose(c, inFocus() && !c.friend ? 'focus' : 'sit'); c.loop = setTimeout(() => tickCat(c), 1500 + Math.random() * 2500);
   });
   if (entrance && catShown(f)) { const t = f.x; f.el.hidden = false; face(f, -1); place(f, innerWidth + 30, bounds(f).y1); f.el.style.transform = `translate(${f.x}px,${f.y}px)`; setTimeout(() => { f.busy = true; walkTo(f, t, bounds(f).y1, 60).then(() => { f.busy = false; setPose(f, 'sit'); catSpeak(f, 'hi! I’m ' + S.pet.friend.name + ' 🧡'); }); }, 60); }
   if (S.pet.friend.on) petEvtT = setTimeout(runEvent, 9000);
