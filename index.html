@@ -48,6 +48,8 @@ button{cursor:pointer;background:none;border:0;padding:0;text-align:inherit}
 .tabs button:hover{color:var(--ink)}
 .tabs button.on{border-color:var(--ink);color:var(--ink)}
 #clock{color:var(--muted)}
+#saved{opacity:0;transition:opacity .3s;color:#5f9d6e;white-space:nowrap}
+#saved.ok{opacity:1} #saved.bad{opacity:1;color:var(--accent)}
 #bubble{position:fixed;top:66px;right:18px;z-index:70;background:var(--ink);color:var(--paper);font:500 12px var(--mono);letter-spacing:.04em;
   padding:9px 14px;border-radius:14px 14px 3px 14px;opacity:0;transform:translateY(6px);transition:.25s;pointer-events:none}
 #bubble.on{opacity:1;transform:none}
@@ -287,6 +289,8 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 #cIn:focus{border-color:var(--ink);background:var(--card)}
 #cSend{background:var(--ink);color:var(--card);font:500 12px var(--mono);text-transform:uppercase;border-radius:99px;height:42px;padding:0 18px}
 .dfoot{display:flex;justify-content:space-between;align-items:center;padding:0 22px 18px;color:var(--muted)}
+#dSave{padding:9px 20px}
+.dbtn{display:flex;gap:16px;align-items:center}
 #dDel{color:var(--accent);font:500 11.5px var(--mono);text-transform:uppercase;letter-spacing:.05em;padding:6px 0}
 
 #toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,30px);background:var(--ink);color:var(--card);padding:11px 18px;border-radius:99px;
@@ -342,7 +346,7 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
     <button id="logo" title="psst… pet me">🐱</button>
     <span class="word">Purrgress</span>
     <div class="tabs"><button data-tab="brands">Brands</button><button data-tab="calendar">Calendar</button><button data-tab="deadlines">Deadlines</button></div>
-    <span id="clock" class="mono"></span>
+    <span id="saved" class="mono" role="status"></span><span id="clock" class="mono"></span>
   </nav>
 
   <div id="stage">
@@ -390,7 +394,7 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
     <textarea id="cIn" rows="1" placeholder="Write a comment…  (Enter to send)"></textarea>
     <button id="cSend" type="submit">Send</button>
   </form>
-  <div class="dfoot mono"><span id="created"></span><button id="dDel">Delete task</button></div>
+  <div class="dfoot mono"><span id="created"></span><span class="dbtn"><button id="dDel">Delete</button><button id="dSave" class="cta">Save</button></span></div>
 </aside>
 <div id="toast"><span id="toastMsg"></span><button id="toastUndo">Undo</button></div>
 
@@ -479,6 +483,7 @@ function migrate(old){ // v1 had flat projects → they become brands with one "
 }
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY)); } catch(e){}
+if (!S) { try { if (window.name.startsWith('purrgress:')) S = JSON.parse(window.name.slice(10)); } catch(e){} }
 if (!S || !S.brands) {
   let old; try { old = JSON.parse(localStorage.getItem('purrgress.v1')); } catch(e){}
   S = old && old.projects ? migrate(old) : seed();
@@ -490,7 +495,16 @@ S.cal = S.cal || {y:now.getFullYear(), m:now.getMonth(), sel:iso(now)};
 if (!['brands','calendar','deadlines'].includes(S.tab)) S.tab = 'brands';
 if (S.brand !== '+' && !S.brands.some(b => b.id === S.brand)) S.brand = S.brands[0]?.id || '+';
 S.adding = false; S.edit = null;
-const save = () => { try { const {adding, edit, ...rest} = S; localStorage.setItem(KEY, JSON.stringify(rest)); } catch(e){} };
+let saveOK = true, savedT;
+function save(){
+  const {adding, edit, ...rest} = S, j = JSON.stringify(rest);
+  try { localStorage.setItem(KEY, j); saveOK = localStorage.getItem(KEY) === j; } catch(e){ saveOK = false; }
+  if (!saveOK) { try { window.name = 'purrgress:' + j; } catch(e){} } // last-resort: survives reloads of this tab
+  const el = $('#saved'); if (!el) return;
+  el.className = 'mono' + (saveOK ? ' ok' : ' bad');
+  el.textContent = saveOK ? 'Saved ✓' : '⚠ Not saved — open in a normal tab';
+  clearTimeout(savedT); if (saveOK) savedT = setTimeout(() => el.classList.remove('ok'), 1800);
+}
 const brandOf = id => S.brands.find(b => b.id === id);
 const projOf = id => S.projects.find(p => p.id === id);
 const task = id => S.tasks.find(t => t.id === id);
@@ -648,7 +662,7 @@ function cardBrand(b){
           <label class="st s-${p.status}" title="Project status"><i></i><span>${stLabel(p.status, PST)}</span><select data-a="pstatus" aria-label="Project status">${opts(p.status, PST)}</select></label>
           <button class="chipb ${p.due ? 'set' : ''}" data-a="pdue">⚑ ${p.due ? 'Due ' + fmt(p.due) : 'Set deadline'}</button>
           <span class="sp"></span>
-          <button class="lnk" data-a="renp">Rename</button><button class="lnk dng" data-a="delp">Delete</button>
+          ${S.edit && S.edit.k === 'proj' && S.edit.id === p.id ? '<button class="btn pri" data-a="rensave">Save</button><button class="btn" data-a="rencancel">Cancel</button>' : '<button class="lnk" data-a="renp">Rename</button><button class="lnk dng" data-a="delp">Delete</button>'}
         </div>
         ${sortTasks(pt).map(t => tkRow(t)).join('')}
         <form class="addt" data-pid="${p.id}"><input placeholder="Add a task…  try “send invoice fri”" autocomplete="off" maxlength="200" aria-label="New task"><button class="cta" type="submit">+ Task</button></form>
@@ -805,6 +819,8 @@ $('#card').addEventListener('click', e => {
   if (a === 'pdue') { const p = projOf(pid); return openCal(e.target.closest('.chipb'), p.due, v => { p.due = v; save(); render(); }); }
   if (a === 'newp') { S.adding = true; S.edit = null; render(); return $('#npIn')?.focus(); }
   if (a === 'renp') { S.edit = {k:'proj', id:pid}; return render(); }
+  if (a === 'rensave') return commitProj($('.rn')?.value || '');
+  if (a === 'rencancel') { S.edit = null; return render(); }
   if (a === 'delp') {
     const p = projOf(pid); snapshotUndo(`“${p.name}” deleted`);
     S.projects = S.projects.filter(x => x !== p); S.tasks = S.tasks.filter(t => t.pid !== p.id); S.open = null; save(); return render();
@@ -861,7 +877,6 @@ $('#card').addEventListener('keydown', e => {
 });
 $('#card').addEventListener('focusout', e => {
   const t = e.target;
-  if (t.classList.contains('rn') && S.edit) commitProj(t.value);
   if (t.id === 'npIn' && S.adding && !t.value.trim() && !(e.relatedTarget && e.relatedTarget.closest?.('#npForm'))) { S.adding = false; render(); }
 });
 $('#card').addEventListener('change', e => {
@@ -966,6 +981,7 @@ $('#dSt').onchange = e => { setStatus(task(openId), e.target.value); fillDrawer(
 $('#dProj').onchange = e => { const t = task(openId), old = t.pid; t.pid = e.target.value; autoProject(old); autoProject(t.pid); save(); fillDrawer(); render(); };
 $('#dDatePick').onclick = e => { const t = task(openId); openCal(e.currentTarget, t.due, v => { t.due = v; save(); fillDrawer(); render(); }); };
 $('#dClear').onclick = () => { task(openId).due = ''; save(); fillDrawer(); render(); };
+$('#dSave').onclick = () => { closeDrawer(); save(); toast('Saved ✓'); };
 $('#dDel').onclick = () => { const t = task(openId); closeDrawer(); removeTask(t); };
 
 $('#cIn').addEventListener('input', e => grow(e.target));
