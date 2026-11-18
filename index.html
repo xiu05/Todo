@@ -146,7 +146,7 @@ button{cursor:pointer;background:none;border:0;padding:0;text-align:inherit}
 .lbl{display:flex;justify-content:space-between;align-items:center;color:var(--accent);margin:20px 0 6px;min-height:30px}
 .lbl>span:last-child{color:var(--muted)}
 .trk{border-bottom:1px solid var(--line)}
-.trow{display:grid;grid-template-columns:34px 1fr 90px 112px;gap:14px;align-items:center;width:100%;padding:13px 6px;border-radius:12px;transition:background .15s;cursor:pointer}
+.trow{display:grid;grid-template-columns:34px 1fr 90px 112px 32px;gap:14px;align-items:center;width:100%;padding:13px 6px;border-radius:12px;transition:background .15s;cursor:pointer}
 .trow:hover{background:var(--soft)}
 .no{font:500 12px var(--mono);color:var(--muted)}
 .tn{min-width:0;display:flex;flex-direction:column}
@@ -288,6 +288,27 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 .madd .cta{margin-left:auto;margin-top:4px}
 .mlnk{display:inline-block;margin-top:8px;color:var(--muted);border-bottom:1px solid transparent} .mlnk:hover{color:var(--ink);border-color:var(--ink)}
 
+/* ---------- timer ---------- */
+.tbtn{flex:none;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--line);font-size:11px;text-align:center;color:var(--muted);transition:.15s;justify-self:end}
+.tbtn:hover{border-color:var(--ink);color:var(--ink)}
+.tbtn.on{background:var(--red);border-color:var(--red);color:var(--card);animation:pulse 1.6s ease-in-out infinite}
+.tbtn.lg{width:auto;height:auto;border-radius:99px;padding:4px 14px;font:800 13px var(--disp);justify-self:auto}
+@keyframes pulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--red) 24%,transparent)}}
+.ttime{color:var(--ink)}
+#timerPill{position:fixed;left:84px;bottom:28px;z-index:50;background:var(--ink);color:var(--card);border-radius:99px;padding:9px 8px 9px 14px;font:500 13px var(--mono);display:flex;gap:9px;align-items:center;box-shadow:var(--shadow)}
+#timerPill[hidden]{display:none}
+#timerPill .rec{width:9px;height:9px;border-radius:50%;background:var(--red);animation:pulse 1.6s ease-in-out infinite}
+#tpName{max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.7;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+#tpStop{width:26px;height:26px;border-radius:50%;background:var(--red);color:var(--card);text-align:center;font-size:10px}
+.tlog{margin:10px 8px 0}
+.tlog summary{cursor:pointer;color:var(--muted);font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;list-style:none}
+.tlog summary::before{content:'▸ '} .tlog[open] summary::before{content:'▾ '}
+.ts{display:flex;gap:10px;align-items:center;font:500 12px var(--mono);padding:4px 2px;color:var(--muted)}
+.ts b{margin-left:auto;color:var(--ink);font-weight:500}
+.tman{display:flex;gap:8px;align-items:center;margin-top:6px}
+.tman input{flex:1;min-width:0;border:0;border-bottom:1.5px dashed var(--line);background:none;outline:0;padding:7px 4px;font:500 12px var(--mono)}
+.tman input:focus{border-bottom-color:var(--ink)}
+
 /* ---------- attachments ---------- */
 .at{display:flex;align-items:center;gap:10px;padding:6px 4px;border-radius:12px;animation:drop .25s ease}
 .at:hover{background:var(--soft)}
@@ -394,14 +415,14 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   #beName{font-size:40px}
   .catwrap{width:112px}
   .badge{width:56px;left:-34px}
-  .trow{grid-template-columns:26px 1fr 82px;gap:10px} .mbar{display:none}
+  .trow{grid-template-columns:26px 1fr 78px 30px;gap:8px} .mbar{display:none}
   .tbody{padding-left:6px}
   .meta .ctx{display:none}
   .st span{display:none} .st{padding:3px 6px}
   .ptool .st span{display:inline} .ptool .st{padding:3px 10px}
   .nbForm input{font-size:46px}
   .cday{min-height:54px;padding:4px} .cchips{display:none} .cdots{display:flex}
-  #fab{right:14px;bottom:14px} #qa{right:12px;bottom:70px} #musicBtn{left:14px;bottom:14px} #music{left:12px;bottom:74px}
+  #fab{right:14px;bottom:14px} #qa{right:12px;bottom:70px} #musicBtn{left:14px;bottom:14px} #timerPill{left:74px;bottom:22px} #tpName{display:none} #music{left:12px;bottom:74px}
   #toast{bottom:76px}
   #drawer{top:auto;width:100vw;height:90vh;transform:translateY(105%);border-left:0;border-top:3px solid var(--ink);border-radius:26px 26px 0 0}
   #drawer.on{transform:none}
@@ -472,6 +493,7 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   </div>
   <div class="dfoot mono"><span id="created"></span><span class="dbtn"><button id="dDel">Delete</button><button id="dSave" class="cta">Save</button></span></div>
 </aside>
+<div id="timerPill" hidden role="timer"><i class="rec"></i><span id="tpTime">00:00:00</span><span id="tpName"></span><button id="tpStop" aria-label="Stop timer" title="Stop timer">■</button></div>
 <button id="musicBtn" aria-label="Music"><span class="vin"></span><b>♪</b></button>
 <section id="music" aria-label="Work music" aria-hidden="true">
   <div class="mh mono"><span>Work music</span><button id="mClose" aria-label="Close music">✕</button></div>
@@ -582,6 +604,8 @@ const now = new Date();
 S.cal = S.cal || {y:now.getFullYear(), m:now.getMonth(), sel:iso(now)};
 if (!['brands','calendar','deadlines'].includes(S.tab)) S.tab = 'brands';
 S.music = S.music || {tracks:[], idx:0};
+S.projects.forEach(p => { p.sessions = p.sessions || []; });
+if (S.timer && !S.projects.some(p => p.id === S.timer.pid)) S.timer = null;
 if (S.brand !== '+' && !S.brands.some(b => b.id === S.brand)) S.brand = S.brands[0]?.id || '+';
 S.adding = false; S.edit = null;
 let saveOK = true, savedT;
@@ -752,22 +776,25 @@ function cardBrand(b){
   const ed = S.edit && S.edit.k === 'brand' ? S.edit.d : null;
   const rows = ps.map((p, i) => {
     const pt = S.tasks.filter(t => t.pid === p.id), q = stats(pt), isOpen = S.open === p.id;
-    const editing = S.edit && S.edit.k === 'proj' && S.edit.id === p.id;
+    const editing = S.edit && S.edit.k === 'proj' && S.edit.id === p.id, run = !!S.timer && S.timer.pid === p.id, tot = projMs(p);
     const [lbl, cls] = p.due ? dueInfo(p.due) : q.next ? dueInfo(q.next) : ['—', ''];
     return `<div class="trk ${isOpen ? 'open' : ''}" data-pid="${p.id}" style="--c:${b.color}">
       <div class="trow" role="button" tabindex="0" data-a="toggle" aria-expanded="${isOpen}"><span class="no">${pad(i+1)}</span>
         <span class="tn">${editing ? `<input class="rn" value="${esc(p.name)}" maxlength="40" aria-label="Project name">` : `<b>${esc(p.name)}</b>`}
-          <span class="sub s-${p.status}"><i class="sdot"></i>${stLabel(p.status, PST)} · ${q.total ? `${q.open} open · ${q.done} done` : 'no tasks'}${q.blocked ? ` · ⚠ ${q.blocked} blocked` : ''}</span></span>
-        <span class="mbar"><i style="width:${q.pct}%"></i></span><span class="tdue ${cls}">${p.due ? '⚑ ' : ''}${lbl}</span></div>
+          <span class="sub s-${p.status}"><i class="sdot"></i>${stLabel(p.status, PST)} · ${q.total ? `${q.open} open · ${q.done} done` : 'no tasks'}${q.blocked ? ` · ⚠ ${q.blocked} blocked` : ''}${tot || run ? ` · <span class="ttime" data-pid="${p.id}">⏱ ${fmtDur(tot)}</span>` : ''}</span></span>
+        <span class="mbar"><i style="width:${q.pct}%"></i></span><span class="tdue ${cls}">${p.due ? '⚑ ' : ''}${lbl}</span>
+        <button class="tbtn ${run ? 'on' : ''}" data-a="timer" aria-label="${run ? 'Stop' : 'Start'} timer" title="${run ? 'Stop' : 'Start'} timer">${run ? '■' : '▶'}</button></div>
       ${isOpen ? `<div class="tbody">
         <div class="ptool">
           <label class="st s-${p.status}" title="Project status"><i></i><span>${stLabel(p.status, PST)}</span><select data-a="pstatus" aria-label="Project status">${opts(p.status, PST)}</select></label>
           <button class="chipb ${p.due ? 'set' : ''}" data-a="pdue">⚑ ${p.due ? 'Due ' + fmt(p.due) : 'Set deadline'}</button>
+          <button class="tbtn lg ${run ? 'on' : ''}" data-a="timer">${run ? `■ Stop · <span class="ttime" data-pid="${p.id}" data-clock>${clock(tot)}</span>` : '▶ Start timer'}</button>
           <span class="sp"></span>
           ${S.edit && S.edit.k === 'proj' && S.edit.id === p.id ? '<button class="btn pri" data-a="rensave">Save</button><button class="btn" data-a="rencancel">Cancel</button>' : '<button class="lnk" data-a="renp">Rename</button><button class="lnk dng" data-a="delp">Delete</button>'}
         </div>
         ${sortTasks(pt).map(t => tkRow(t)).join('')}
         <div class="addt" data-pid="${p.id}"><input placeholder="Add a task…  try “send invoice fri”" autocomplete="off" maxlength="200" aria-label="New task"><button class="cta" data-a="taskadd">+ Task</button></div>
+        ${tlogHTML(p)}
       </div>` : ''}
     </div>`;
   }).join('');
@@ -782,7 +809,7 @@ function cardBrand(b){
       <div class="berow"><button type="button" class="btn pri" data-a="besave">Save</button><button type="button" class="btn" data-a="becancel">Cancel</button><button type="button" class="btn dng" data-a="delb">Delete brand</button></div></div>` : null;
   return shell({
     kicker:`BRAND · ${pad(S.brands.indexOf(b)+1)}`, title:b.name, rename:true, head,
-    stk:[`${ps.length} project${ps.length === 1 ? '' : 's'}`, `${s.open} open`, s.next ? `next · ${dueInfo(s.next)[0]}` : 'no deadline', ...(s.blocked ? [{t:`⚠ ${s.blocked} blocked`, warn:true}] : [])],
+    stk:[`${ps.length} project${ps.length === 1 ? '' : 's'}`, `${s.open} open`, s.next ? `next · ${dueInfo(s.next)[0]}` : 'no deadline', ...(ps.reduce((a, x) => a + projMs(x), 0) ? [`⏱ ${fmtDur(ps.reduce((a, x) => a + projMs(x), 0))}`] : []), ...(s.blocked ? [{t:`⚠ ${s.blocked} blocked`, warn:true}] : [])],
     pct:s.pct, color:ed ? ed.color : b.color, dialLabel:'DONE', sleep:s.total > 0 && !s.open, body,
     fine:`<div class="fine"><button data-a="eb">Edit brand</button></div>`});
 }
@@ -910,6 +937,47 @@ $('#tiles').addEventListener('click', e => { const t = e.target.closest('.tile')
 $('#prev').onclick = () => step(-1); $('#next').onclick = () => step(1);
 addEventListener('resize', () => renderStage());
 
+/* ---------- timer: start/stop per project, time log, manual time ---------- */
+const clock = ms => `${pad(Math.floor(ms / 3600000))}:${pad(Math.floor(ms % 3600000 / 60000))}:${pad(Math.floor(ms % 60000 / 1000))}`;
+const fmtDur = ms => { const t = Math.floor(ms / 1000), h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60); return h ? `${h}h ${pad(m)}m` : m ? `${m}m` : `${t}s`; };
+const projMs = p => (p.sessions || []).reduce((a, x) => a + (x.e - x.s), 0) + (S.timer && S.timer.pid === p.id ? Date.now() - S.timer.s : 0);
+const hm = t => { const d = new Date(t); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+function startTimer(pid){
+  const was = S.timer && projOf(S.timer.pid); if (S.timer) stopTimer(true);
+  S.timer = {pid, s:Date.now()}; save(); render(); tickTimer();
+  toast(was && was.id !== pid ? `Switched timer → ${q(projOf(pid).name)}` : `Timer started — ${q(projOf(pid).name)}`);
+}
+function stopTimer(silent){
+  if (!S.timer) return; const {pid, s: st} = S.timer, e = Date.now(), p = projOf(pid); S.timer = null;
+  if (p && e - st >= 1000) { (p.sessions = p.sessions || []).push({s:st, e}); if (!silent) toast(`Logged ${fmtDur(e - st)} on ${q(p.name)}`); }
+  save(); render(); tickTimer();
+}
+function tickTimer(){
+  const pill = $('#timerPill'), t = S.timer, p = t && projOf(t.pid);
+  pill.hidden = !p;
+  if (!p) { document.title = 'Purrgress · Plan · Focus · Achieve'; return; }
+  const ms = Date.now() - t.s;
+  $('#tpTime').textContent = clock(ms); $('#tpName').textContent = p.name;
+  document.title = `⏱ ${clock(ms)} · ${p.name}`;
+  document.querySelectorAll('.ttime').forEach(el => { const pp = projOf(el.dataset.pid); if (pp) el.textContent = 'clock' in el.dataset ? clock(projMs(pp)) : '⏱ ' + fmtDur(projMs(pp)); });
+}
+setInterval(tickTimer, 1000);
+$('#tpStop').onclick = () => stopTimer();
+function tlogHTML(p){
+  const ss = p.sessions || [], tot = projMs(p);
+  return `<details class="tlog" data-pid="${p.id}" ${S.tlog === p.id ? 'open' : ''}><summary>Time log · ${ss.length} session${ss.length === 1 ? '' : 's'} · ${fmtDur(tot)} total</summary>
+    ${ss.length ? [...ss.keys()].reverse().slice(0, 20).map(i => `<div class="ts" data-i="${i}"><span>${fmtLong(iso(new Date(ss[i].s)))} · ${hm(ss[i].s)}–${hm(ss[i].e)}</span><b>${fmtDur(ss[i].e - ss[i].s)}</b><button class="mx" data-a="tdel" aria-label="Delete time entry">×</button></div>`).join('') : '<div class="ts">No time logged yet. Press ▶ to start.</div>'}
+    <div class="tman" data-pid="${p.id}"><input placeholder="Add time manually — e.g. 45m or 1h30" autocomplete="off" aria-label="Add time manually"><button class="btn" data-a="tadd">+ Add</button></div></details>`;
+}
+function parseDur(v){
+  v = v.toLowerCase().trim(); if (!v) return 0;
+  let m;
+  if ((m = v.match(/^(\d+(?:\.\d+)?)\s*h(?:ours?|rs?)?\s*(?:(\d+)\s*m?(?:in)?)?$/))) return Math.round(+m[1] * 3600000 + (m[2] ? +m[2] * 60000 : 0));
+  if ((m = v.match(/^(\d+)\s*m(?:in(?:ute)?s?)?$/)) || (m = v.match(/^(\d+)$/))) return +m[1] * 60000;
+  if ((m = v.match(/^(\d+):(\d{2})$/))) return +m[1] * 3600000 + +m[2] * 60000;
+  return 0;
+}
+
 /* ---------- card events ---------- */
 const q = s => `“${s}”`;
 const nameCh = (a, b) => `${q(a)} → ${q(b)}`;
@@ -968,12 +1036,14 @@ async function delProj(p){
   const n = S.tasks.filter(t => t.pid === p.id).length;
   if (!await ask({title:'Delete this client / project?', body:`${q(p.name)} and its ${n} task${n === 1 ? '' : 's'} will be removed.`, ok:'Yes, delete', danger:true})) return;
   snapshotUndo(`${q(p.name)} deleted`);
+  if (S.timer && S.timer.pid === p.id) S.timer = null;
   S.projects = S.projects.filter(x => x !== p); S.tasks = S.tasks.filter(t => t.pid !== p.id); S.open = null; save(); render();
 }
 async function delBrand(b){
   const pids = new Set(S.projects.filter(p => p.bid === b.id).map(p => p.id)), n = S.tasks.filter(t => pids.has(t.pid)).length;
   if (!await ask({title:'Delete this brand?', body:`${q(b.name)}, its ${pids.size} project${pids.size === 1 ? '' : 's'} and ${n} task${n === 1 ? '' : 's'} will be removed.`, ok:'Yes, delete', danger:true})) return;
   snapshotUndo(`Brand ${q(b.name)} deleted`);
+  if (S.timer && pids.has(S.timer.pid)) S.timer = null;
   S.tasks = S.tasks.filter(t => !pids.has(t.pid)); S.projects = S.projects.filter(p => p.bid !== b.id);
   S.brands = S.brands.filter(x => x !== b); S.brand = S.brands[0]?.id || '+'; S.open = null; S.edit = null; save(); render();
 }
@@ -994,6 +1064,13 @@ $('#card').addEventListener('click', e => {
   }
   const pid = e.target.closest('.trk')?.dataset.pid;
   if (e.target.closest('.ptool .st')) return;
+  if (a === 'timer') return S.timer && S.timer.pid === pid ? stopTimer() : startTimer(pid);
+  if (a === 'tadd') { const box = e.target.closest('.tman'), i = box.querySelector('input'), ms = parseDur(i.value); if (!ms) { toast('Try 45m, 1h30 or 1.5h'); return i.focus(); }
+    const p = projOf(box.dataset.pid), now = Date.now(); (p.sessions = p.sessions || []).push({s:now - ms, e:now, manual:true}); S.tlog = p.id; save(); render(); return toast(`Added ${fmtDur(ms)} to ${q(p.name)}`); }
+  if (a === 'tdel') {
+    const p = projOf(e.target.closest('.tlog').dataset.pid), i = +e.target.closest('.ts').dataset.i, x = p.sessions[i];
+    return ask({title:'Delete this time entry?', body:`${fmtDur(x.e - x.s)} on ${q(p.name)} will be removed.`, ok:'Yes, delete', danger:true}).then(ok => { if (!ok) return; p.sessions.splice(i, 1); S.tlog = p.id; save(); render(); toast('Time entry deleted'); });
+  }
   if (a === 'toggle') return toggleProject(pid);
   if (a === 'pdue') { const p = projOf(pid); return openCal(e.target.closest('.chipb'), p.due, v => { p.due = v; save(); render(); toast(v ? `Deadline for ${q(p.name)} set to ${fmtLong(v)}` : 'Project deadline cleared'); }); }
   if (a === 'newp') { S.adding = true; S.edit = null; render(); return $('#npIn')?.focus(); }
@@ -1019,11 +1096,12 @@ $('#card').addEventListener('click', e => {
   if (a === 'ctoday') { const n = new Date(); S.cal = {y:n.getFullYear(), m:n.getMonth(), sel:iso(n)}; save(); return render(); }
   if (a === 'calnew') return openQA({due:S.cal.sel});
 });
+$('#card').addEventListener('toggle', e => { if (e.target.classList?.contains('tlog')) S.tlog = e.target.open ? e.target.dataset.pid : null; }, true);
 $('#card').addEventListener('dblclick', e => { if (e.target.closest('.big[data-edit]')) editBrand(); });
 $('#card').addEventListener('keydown', e => {
   const t = e.target;
   if (e.key === 'Enter' && !e.isComposing && t.matches('input')) { // Enter = press the form's main button (no <form>, so it works in sandboxed previews)
-    const btn = t.closest('#nbForm,#npForm,.addt,.be,.tn')?.querySelector('[data-a=nbadd],[data-a=npadd],[data-a=taskadd],[data-a=besave]');
+    const btn = t.closest('#nbForm,#npForm,.addt,.be,.tn,.tman')?.querySelector('[data-a=nbadd],[data-a=npadd],[data-a=taskadd],[data-a=besave],[data-a=tadd]');
     if (btn) { e.preventDefault(); return btn.click(); }
     if (t.classList.contains('rn')) { e.preventDefault(); return saveProjRename(); }
   }
@@ -1452,7 +1530,7 @@ function applyTheme(){
 $('#themeBtn').onclick = () => { S.theme = S.theme === 'light' ? 'dark' : 'light'; save(); applyTheme(); };
 $('#logo').innerHTML = logoSVG;
 applyTheme();
-render();
+render(); tickTimer();
 </script>
 </body>
 </html>
