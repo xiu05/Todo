@@ -19,6 +19,8 @@ The message lists what is missing. Fix it in Vercel and **redeploy** (variables 
 - "Upstash Redis REST URL/token" missing → open the project's **Storage** tab and connect an Upstash Redis database
   (it must expose a *REST* URL and token; a plain `REDIS_URL` alone is not enough). Any variable prefix works (`UPSTASH_REDIS_…`, `KV_…`, `STORAGE_…`).
 - Check the variables are enabled for the environment you're visiting (Production vs Preview).
+- A variable created under the team-wide **Shared** tab must be *linked* to the project, or added in the project's own Settings → Environment Variables.
+- After any change, wait for a **new** deployment to finish (Deployments tab shows Ready) — old deployments never see new variables.
 
 ### How sync behaves
 - Changes upload ~1.5 s after you make them. Other devices pick them up when you open the page, return to the tab, or every 45 s while it's visible.
