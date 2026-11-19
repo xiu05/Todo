@@ -1961,7 +1961,7 @@ async function syncPull(initial){
   try {
     const m = await syncApi('GET', null, true);
     if (m.status === 401) return setSyncStatus('error', 'Wrong passcode');
-    if (m.status === 501) return setSyncStatus('error', 'The server isn’t set up for sync yet (see README)');
+    if (m.status === 501) return setSyncStatus('error', 'The server isn’t set up for sync yet. Missing: ' + ((m.data && m.data.missing) || ['PURRGRESS_PASSCODE', 'Upstash Redis']).join(', ') + '. Add it in Vercel and redeploy (see README).');
     if (m.status === 404 || m.status === 405) return setSyncStatus('error', 'No sync server here — open your deployed Vercel site');
     if (m.status !== 200 || !m.data) return setSyncStatus('error', `Server error (${m.status})`);
     const at = m.data.updatedAt || 0;
