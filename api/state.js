@@ -1,4 +1,4 @@
-// Vercel serverless function: stores each signed-in account's Purrgress state as one JSON value in Upstash Redis.
+// Vercel serverless function: stores each signed-in account's Pawgress state as one JSON value in Upstash Redis.
 // Requires only the Upstash Redis REST variables (added automatically when you connect Upstash from the Vercel Marketplace):
 //   UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN  (older "KV_REST_API_URL" / "KV_REST_API_TOKEN" names also work)
 const { redis, missing, auth, bodyOf, K } = require('./_lib');

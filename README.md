@@ -1,4 +1,4 @@
-# Purrgress
+# Pawgress
 
 A personal brand → project → task tracker with a pet cat. The whole app is one file, `index.html`.
 It works on its own (data is saved in your browser). To use the **same data on several devices**, deploy to Vercel and turn on cloud sync.

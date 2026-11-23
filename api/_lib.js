@@ -1,4 +1,4 @@
-// Shared helpers for the Purrgress API (files starting with "_" are not exposed as routes by Vercel).
+// Shared helpers for the Pawgress API (files starting with "_" are not exposed as routes by Vercel).
 const crypto = require('crypto');
 
 // Find the Upstash REST credentials whatever prefix Vercel gave them
