@@ -188,11 +188,15 @@ button{cursor:pointer;background:none;border:0;padding:0;text-align:inherit}
 .ctx{font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--c);white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis}
 .due{font:500 11.5px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer;white-space:nowrap;padding:3px 4px;border-radius:8px;min-width:58px;text-align:right}
 .due:hover{background:var(--line);color:var(--ink)}
-.due.none{opacity:0} .tk:hover .due.none{opacity:.8}
+.due{border:1.5px solid var(--line)}
+.due.none{opacity:.55;border-style:dashed} .tk:hover .due.none{opacity:1}
+.due.bad{border-color:var(--red)} .due.today{border-color:var(--yellow)}
+.adate{font:500 11.5px var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border:1.5px dashed var(--line);border-radius:8px;padding:5px 9px;white-space:nowrap;cursor:pointer}
+.adate:hover{color:var(--ink);border-color:var(--ink)} .adate.set{color:var(--ink);border-style:solid}
 .due.soon{color:var(--ytext)}
 .x{color:var(--muted);opacity:0;font-size:18px;line-height:1;padding:2px 5px;border-radius:8px;transition:.15s}
 .tk:hover .x{opacity:.8} .x:hover{color:var(--red);opacity:1}
-@media (hover:none){.x{opacity:.5}.due.none{opacity:.6}}
+@media (hover:none){.x{opacity:.5}.due.none{opacity:.75}}
 .addt{display:flex;gap:10px;align-items:center;margin-top:4px}
 .addt input,.newp input{flex:1;min-width:0;border:0;border-bottom:1.5px dashed var(--line);background:none;outline:0;padding:10px 8px;font:500 13px var(--mono);letter-spacing:.02em}
 .addt input:focus,.newp input:focus{border-bottom-color:var(--ink)}
@@ -704,6 +708,7 @@ if (!S || !S.brands) {
 }
 S.tasks.forEach(t => { t.comments = t.comments || []; t.created = t.created || Date.now(); t.status = t.status || (t.done ? 'done' : 'todo'); t.done = t.status === 'done'; });
 S.projects.forEach(p => { p.due = p.due || ''; if (!p.status) { const ts = S.tasks.filter(t => t.pid === p.id); p.status = ts.length && ts.every(t => t.done) ? 'done' : ts.some(t => t.status !== 'todo') ? 'doing' : 'todo'; } });
+pushProjDues();
 const now = new Date();
 S.cal = S.cal || {y:now.getFullYear(), m:now.getMonth(), sel:iso(now)};
 if (!['brands','calendar','deadlines'].includes(S.tab)) S.tab = 'brands';
@@ -739,6 +744,7 @@ const projOf = id => S.projects.find(p => p.id === id);
 const task = id => S.tasks.find(t => t.id === id);
 function ctx(t){ const p = projOf(t.pid) || {name:'?', bid:null}; const b = brandOf(p.bid) || {name:'?', color:'#999'}; return {p, b}; }
 let lastAdded = null, focusAdd = false;
+const addDue = {}; // pending deadline for the next task typed in each project
 
 /* a task's status moves the project along automatically (you can still override it) */
 function autoProject(pid){
@@ -853,7 +859,7 @@ function tkRow(t, showCtx){
       ${showCtx ? `<span class="ctx">${esc(b.name)} / ${esc(p.name)}</span>` : ''}
       ${(t.atts || []).length ? `<span class="cc">📎 ${t.atts.length}</span>` : ''}${n ? `<span class="cc">✎ ${n}</span>` : ''}
       <label class="st s-${t.status}" title="Status"><i></i><span>${stLabel(t.status)}</span><select data-a="status" aria-label="Status">${opts(t.status, ST)}</select></label>
-      <button class="due ${cls}" data-a="pickdate" aria-label="Pick deadline">${lbl}</button>
+      <button class="due ${cls}" data-a="pickdate" aria-label="Pick deadline" title="Deadline for this task">${t.due ? '' : '📅 '}${lbl}</button>
       <button class="x" data-a="del" aria-label="Delete task">×</button>
     </span></div>`;
 }
@@ -893,24 +899,23 @@ function cardBrand(b){
   const rows = ps.map((p, i) => {
     const pt = S.tasks.filter(t => t.pid === p.id), q = stats(pt), isOpen = S.open === p.id;
     const editing = S.edit && S.edit.k === 'proj' && S.edit.id === p.id, run = !!S.timer && S.timer.pid === p.id, tot = projMs(p);
-    const [lbl, cls] = p.due ? dueInfo(p.due) : q.next ? dueInfo(q.next) : ['—', ''];
+    const [lbl, cls] = q.next ? dueInfo(q.next) : p.due ? dueInfo(p.due) : ['no dates', 'none'];
     return `<div class="trk ${isOpen ? 'open' : ''}" data-pid="${p.id}" style="--c:${b.color}">
       <div class="trow" role="button" tabindex="0" data-a="toggle" aria-expanded="${isOpen}"><span class="no">${pad(i+1)}</span>
         <span class="tn">${editing ? `<input class="rn" value="${esc(p.name)}" maxlength="40" aria-label="Project name">` : `<b>${esc(p.name)}</b>`}
-          <span class="sub s-${p.status}"><i class="sdot"></i>${stLabel(p.status, PST)} · ${q.total ? `${q.open} open · ${q.done} done` : 'no tasks'}${q.blocked ? ` · ⚠ ${q.blocked} blocked` : ''}${tot || run ? ` · <span class="ttime" data-pid="${p.id}">⏱ ${fmtDur(tot)}</span>` : ''}</span></span>
-        <span class="mbar"><i style="width:${q.pct}%"></i></span><span class="tdue ${cls}">${p.due ? '⚑ ' : ''}${lbl}</span>
+          <span class="sub s-${p.status}"><i class="sdot"></i>${stLabel(p.status, PST)} · ${q.total ? `${q.open} open · ${q.done} done` : 'no tasks'}${q.blocked ? ` · ⚠ ${q.blocked} blocked` : ''}${q.overdue ? ` · ⚠ ${q.overdue} late` : ''}${tot || run ? ` · <span class="ttime" data-pid="${p.id}">⏱ ${fmtDur(tot)}</span>` : ''}</span></span>
+        <span class="mbar"><i style="width:${q.pct}%"></i></span><span class="tdue ${cls}">${q.next ? 'next · ' : p.due ? '⚑ ' : ''}${lbl}</span>
         <button class="tbtn ${run ? 'on' : ''}" data-a="timer" aria-label="${run ? 'Stop' : 'Start'} timer" title="${run ? 'Stop' : 'Start'} timer">${run ? '■' : '▶'}</button></div>
       ${isOpen ? `<div class="tbody">
         <div class="ptool">
           <label class="st s-${p.status}" title="Project status"><i></i><span>${stLabel(p.status, PST)}</span><select data-a="pstatus" aria-label="Project status">${opts(p.status, PST)}</select></label>
-          <button class="chipb ${p.due ? 'set' : ''}" data-a="pdue">⚑ ${p.due ? 'Due ' + fmt(p.due) : 'Set deadline'}</button>
           <button class="tbtn lg ${run ? 'on' : ''}" data-a="timer">${run ? `■ Stop · <span class="ttime" data-pid="${p.id}" data-clock>${clock(tot)}</span>` : '▶ Start timer'}</button>
           <button class="chipb ${S.pomoSet.on ? 'pomo' : ''}" data-a="pomo" title="Pomodoro: focus / break cycles">🍅 ${S.pomoSet.on ? `${S.pomoSet.f}·${S.pomoSet.b}` : 'Pomodoro off'}</button>
           <span class="sp"></span>
           ${S.edit && S.edit.k === 'proj' && S.edit.id === p.id ? '<button class="btn pri" data-a="rensave">Save</button><button class="btn" data-a="rencancel">Cancel</button>' : '<button class="lnk" data-a="renp">Rename</button><button class="lnk dng" data-a="delp">Delete</button>'}
         </div>
         ${sortTasks(pt).map(t => tkRow(t)).join('')}
-        <div class="addt" data-pid="${p.id}"><input placeholder="Add a task…  try “send invoice fri”" autocomplete="off" maxlength="200" aria-label="New task"><button class="cta" data-a="taskadd">+ Task</button></div>
+        <div class="addt" data-pid="${p.id}"><input placeholder="Add a small task…  try “send invoice fri”" autocomplete="off" maxlength="200" aria-label="New task"><button class="adate ${addDue[p.id] ? 'set' : ''}" data-a="adate" aria-label="Deadline for the new task">📅 ${addDue[p.id] ? dueInfo(addDue[p.id])[0] : 'Date'}</button><button class="cta" data-a="taskadd">+ Task</button></div>
         ${tlogHTML(p)}
       </div>` : ''}
     </div>`;
@@ -1161,9 +1166,9 @@ function createProject(){
   S.adding = false; S.projects.push(p); S.open = p.id; focusAdd = true; save(); render();
   notify(`Client / project ${q(v)} has been created`);
 }
-function createTask(pid, raw){
+function createTask(pid, raw, pick = ''){
   if (!raw) return;
-  const [title, due] = smartDate(raw);
+  const [title, typed] = smartDate(raw), due = pick || typed;
   const t = {id:uid(), pid, title, due, status:'todo', done:false, created:Date.now(), comments:[]};
   S.tasks.push(t); autoProject(pid); lastAdded = t.id; focusAdd = true; save(); render();
   toast(`Task ${q(title)} added`);
@@ -1216,10 +1221,11 @@ $('#card').addEventListener('click', e => {
     return ask({title:'Delete this time entry?', body:`${fmtDur(x.e - x.s)} on ${q(p.name)} will be removed.`, ok:'Yes, delete', danger:true}).then(ok => { if (!ok) return; p.sessions.splice(i, 1); S.tlog = p.id; save(); render(); toast('Time entry deleted'); });
   }
   if (a === 'toggle') return toggleProject(pid);
-  if (a === 'pdue') { const p = projOf(pid); return openCal(e.target.closest('.chipb'), p.due, v => { p.due = v; save(); render(); toast(v ? `Deadline for ${q(p.name)} set to ${fmtLong(v)}` : 'Project deadline cleared'); }); }
+  if (a === 'adate') { const btn = e.target.closest('.adate'), box = btn.closest('.addt'), k = box.dataset.pid;
+    return openCal(btn, addDue[k] || '', v => { addDue[k] = v; btn.textContent = '📅 ' + (v ? dueInfo(v)[0] : 'Date'); btn.classList.toggle('set', !!v); box.querySelector('input').focus(); }); }
   if (a === 'newp') { S.adding = true; S.edit = null; render(); return $('#npIn')?.focus(); }
   if (a === 'npadd') return createProject();
-  if (a === 'taskadd') { const box = e.target.closest('.addt'), i = box.querySelector('input'); if (!i.value.trim()) return i.focus(); const v = i.value.trim(); return createTask(box.dataset.pid, v); }
+  if (a === 'taskadd') { const box = e.target.closest('.addt'), i = box.querySelector('input'); if (!i.value.trim()) return i.focus(); const v = i.value.trim(), k = box.dataset.pid, d = addDue[k] || ''; addDue[k] = ''; return createTask(k, v, d); }
   if (a === 'renp') { S.edit = {k:'proj', id:pid}; return render(); }
   if (a === 'rensave') return saveProjRename();
   if (a === 'rencancel') { S.edit = null; return render(); }
@@ -2119,10 +2125,15 @@ async function syncPush(force){
     else setSyncStatus('error', `Server error (${r.status})`);
   } catch(e){ setSyncStatus('offline', 'Offline — will retry'); }
 }
+/* deadlines now live on each task: a legacy project deadline moves onto its undated open tasks */
+function pushProjDues(){
+  S.projects.forEach(p => { if (!p.due) return; const ts = S.tasks.filter(t => t.pid === p.id && !t.done && !t.due); if (ts.length) { ts.forEach(t => t.due = p.due); p.due = ''; } });
+}
 function fixupRemote(){
   S.tasks = S.tasks || []; S.projects = S.projects || []; S.brands = S.brands || [];
   S.tasks.forEach(t => { t.comments = t.comments || []; t.created = t.created || Date.now(); t.status = t.status || (t.done ? 'done' : 'todo'); t.done = t.status === 'done'; });
   S.projects.forEach(p => { p.due = p.due || ''; p.sessions = p.sessions || []; p.status = p.status || 'todo'; });
+  pushProjDues();
   S.music = S.music || {tracks:[], idx:0};
   S.pet = Object.assign({on:true, name:'', love:30, treats:0, done:0, seeded:true, asked:true}, S.pet || {});
   S.pet.friend = Object.assign({on:true, name:'Pudding', seen:true}, S.pet.friend || {});
