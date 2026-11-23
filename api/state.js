@@ -1,45 +1,19 @@
-// Vercel serverless function: stores your whole Purrgress state as one JSON value in Upstash Redis.
-// Required environment variables (Vercel → Project → Settings → Environment Variables):
-//   PURRGRESS_PASSCODE            a passcode only you know (the app asks for it once per device)
-//   UPSTASH_REDIS_REST_URL        } added automatically when you connect Upstash Redis from the Vercel Marketplace
-//   UPSTASH_REDIS_REST_TOKEN      } (older "KV_REST_API_URL" / "KV_REST_API_TOKEN" names also work)
-const crypto = require('crypto');
+// Vercel serverless function: stores each signed-in account's Purrgress state as one JSON value in Upstash Redis.
+// Requires only the Upstash Redis REST variables (added automatically when you connect Upstash from the Vercel Marketplace):
+//   UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN  (older "KV_REST_API_URL" / "KV_REST_API_TOKEN" names also work)
+const { redis, missing, auth, bodyOf, K } = require('./_lib');
 
-const KEY = 'purrgress:state';
-// Find the Upstash REST credentials whatever prefix Vercel gave them
-// (UPSTASH_REDIS_REST_URL, KV_REST_API_URL, or a custom prefix such as STORAGE_REST_API_URL).
-const envKey = (re) => Object.keys(process.env).find((k) => re.test(k) && process.env[k]);
-const URL_KEY = envKey(/REST(_API)?_URL$/);
-const TOKEN_KEY = Object.keys(process.env).find((k) => /REST(_API)?_TOKEN$/.test(k) && !/READ_ONLY/.test(k) && process.env[k]);
-const REDIS_URL = URL_KEY && process.env[URL_KEY];
-const REDIS_TOKEN = TOKEN_KEY && process.env[TOKEN_KEY];
 const MAX_BYTES = 900 * 1024; // Upstash values are limited to ~1 MB
-
-async function redis(cmd) {
-  const r = await fetch(REDIS_URL, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${REDIS_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(cmd),
-  });
-  if (!r.ok) throw new Error(`redis ${r.status}`);
-  return (await r.json()).result;
-}
-
-const sameSecret = (a, b) => {
-  const h = (x) => crypto.createHash('sha256').update(String(x)).digest();
-  return crypto.timingSafeEqual(h(a), h(b));
-};
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
-  const missing = [];
-  if (!process.env.PURRGRESS_PASSCODE) missing.push('PURRGRESS_PASSCODE');
-  if (!REDIS_URL) missing.push('Upstash Redis REST URL (connect Upstash under Storage)');
-  if (!REDIS_TOKEN) missing.push('Upstash Redis REST token (connect Upstash under Storage)');
-  if (missing.length) return res.status(501).json({ error: 'not_configured', missing });
-  if (!sameSecret(req.headers['x-passcode'] || '', process.env.PURRGRESS_PASSCODE)) return res.status(401).json({ error: 'bad_passcode' });
+  const miss = missing();
+  if (miss.length) return res.status(501).json({ error: 'not_configured', missing: miss });
 
   try {
+    const me = await auth(req); // each account has its own document
+    if (!me) return res.status(401).json({ error: 'unauthorized' });
+    const KEY = K.state(me.uid);
     if (req.method === 'GET') {
       const raw = await redis(['GET', KEY]);
       if (!raw) return res.status(200).json({ state: null, updatedAt: 0 });
@@ -49,7 +23,7 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'PUT') {
-      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      const body = bodyOf(req);
       if (!body || typeof body.state !== 'object' || body.state === null) return res.status(400).json({ error: 'bad_body' });
       const json = JSON.stringify(body.state);
       if (Buffer.byteLength(json) > MAX_BYTES) return res.status(413).json({ error: 'too_large' });
