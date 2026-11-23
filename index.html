@@ -725,10 +725,10 @@ S.pomoSet = Object.assign({on:false, f:25, b:5, l:15, every:4}, S.pomoSet || {})
 if (S.timer && !S.projects.some(p => p.id === S.timer.pid)) S.timer = null;
 if (S.brand !== '+' && !S.brands.some(b => b.id === S.brand)) S.brand = S.brands[0]?.id || '+';
 S.adding = false; S.edit = null;
-let SYNC = {token:'', user:'', owner:'', at:0, dirty:false};
+let SYNC = {pass:'', at:0, dirty:false};
 try { Object.assign(SYNC, JSON.parse(localStorage.getItem('purrgress.sync')) || {}); } catch(e){}
-delete SYNC.pass; SYNC.status = SYNC.token ? 'syncing' : 'off'; SYNC.applying = false; SYNC.conflict = null; SYNC.msg = ''; SYNC.view = 'in'; SYNC.info = null;
-const saveSync = () => { try { const {status, applying, conflict, msg, view, info, ...rest} = SYNC; localStorage.setItem('purrgress.sync', JSON.stringify(rest)); } catch(e){} };
+SYNC.status = SYNC.pass ? 'syncing' : 'off'; SYNC.applying = false; SYNC.conflict = null; SYNC.msg = '';
+const saveSync = () => { try { const {status, applying, conflict, msg, ...rest} = SYNC; localStorage.setItem('purrgress.sync', JSON.stringify(rest)); } catch(e){} };
 let saveOK = true, savedT;
 function save(){
   const {adding, edit, ...rest} = S, j = JSON.stringify(rest);
@@ -2095,7 +2095,7 @@ if (S.pet.on && !S.pet.name && !S.pet.asked) setTimeout(() => { if (S.pet.on && 
 const SYNC_KEYS = ['brands', 'projects', 'tasks', 'music', 'pet', 'timer', 'pomoSet'];
 const syncPayload = () => { const o = {}; SYNC_KEYS.forEach(k => o[k] = S[k]); return JSON.parse(JSON.stringify(o)); };
 async function syncApi(method, body, meta){
-  const r = await fetch('/api/state' + (meta ? '?meta=1' : ''), {method, cache:'no-store', headers:{...(SYNC.token ? {Authorization:'Bearer ' + SYNC.token} : {}), ...(body ? {'Content-Type':'application/json'} : {})}, body:body ? JSON.stringify(body) : undefined});
+  const r = await fetch('/api/state' + (meta ? '?meta=1' : ''), {method, cache:'no-store', headers:{'x-passcode':SYNC.pass, ...(body ? {'Content-Type':'application/json'} : {})}, body:body ? JSON.stringify(body) : undefined});
   let data = null; try { data = await r.json(); } catch(e){}
   return {status:r.status, data};
 }
@@ -2104,25 +2104,24 @@ function setSyncStatus(st, msg = ''){
   const label = {off:'☁', ok:'☁', syncing:'⟳', pending:'⟳', offline:'⚠', error:'⚠', conflict:'⚠'}[st] || '☁';
   const cls = st === 'ok' ? 'ok' : (st === 'error' || st === 'conflict' || st === 'offline') ? 'bad' : (st === 'syncing' || st === 'pending') ? 'busy' : '';
   const b = $('#syncBtn'); b.textContent = label; b.className = cls;
-  $('#syncBtn2').textContent = st === 'off' ? '☁ Sign in' : `${label} Sync${st === 'ok' ? 'ed' : ''}`;
-  $('#syncBtn').title = SYNC.token ? `Signed in as ${SYNC.user}` : 'Sign in to sync across devices';
+  $('#syncBtn2').textContent = `${label} Sync${st === 'ok' ? 'ed' : ''}`;
   if (!$('#sync').hidden) renderSync();
 }
 let syncPushT = 0;
 function onSaved(){
-  if (!SYNC.token) return;
+  if (!SYNC.pass) return;
   if (SYNC.hash && JSON.stringify(syncPayload()) === SYNC.hash) return; // only real data changes sync (not which tab you're on)
   SYNC.dirty = true; saveSync();
   if (SYNC.conflict) return;
   clearTimeout(syncPushT); syncPushT = setTimeout(() => syncPush(), 1500); setSyncStatus('pending');
 }
 async function syncPush(force){
-  if (!SYNC.token) return; setSyncStatus('syncing');
+  if (!SYNC.pass) return; setSyncStatus('syncing');
   try {
     const r = await syncApi('PUT', {state:syncPayload(), baseAt:SYNC.at, force:!!force});
     if (r.status === 200) { SYNC.at = r.data.updatedAt; SYNC.dirty = false; SYNC.hash = JSON.stringify(syncPayload()); saveSync(); setSyncStatus('ok'); SYNC.lastAt = Date.now(); }
     else if (r.status === 409) { SYNC.conflict = {remote:r.data, kind:'diverged'}; setSyncStatus('conflict'); openSync(true); }
-    else if (r.status === 401) sessionEnded();
+    else if (r.status === 401) setSyncStatus('error', 'Wrong passcode');
     else if (r.status === 413) setSyncStatus('error', 'Your data is too large to sync (limit ≈ 900 KB)');
     else setSyncStatus('error', `Server error (${r.status})`);
   } catch(e){ setSyncStatus('offline', 'Offline — will retry'); }
@@ -2155,12 +2154,12 @@ function applyRemote(doc){
   render(); applyPet(); tickTimer(); setSyncStatus('ok'); SYNC.lastAt = Date.now();
 }
 async function syncPull(initial){
-  if (!SYNC.token || SYNC.conflict) return;
+  if (!SYNC.pass || SYNC.conflict) return;
   try {
     const m = await syncApi('GET', null, true);
-    if (m.status === 401) return sessionEnded();
-    if (m.status === 501 && m.data && m.data.error === 'not_configured') return setSyncStatus('error', 'The server isn’t set up for sync yet. Missing: ' + ((m.data && m.data.missing) || ['Upstash Redis']).join(', ') + '. Add it in Vercel and redeploy (see README).');
-    if (m.status === 404 || m.status === 405 || m.status === 501) return setSyncStatus('error', 'No sync server here — open your deployed Vercel site');
+    if (m.status === 401) return setSyncStatus('error', 'Wrong passcode');
+    if (m.status === 501) return setSyncStatus('error', 'The server isn’t set up for sync yet. Missing: ' + ((m.data && m.data.missing) || ['PURRGRESS_PASSCODE', 'Upstash Redis']).join(', ') + '. Add it in Vercel and redeploy (see README).');
+    if (m.status === 404 || m.status === 405) return setSyncStatus('error', 'No sync server here — open your deployed Vercel site');
     if (m.status !== 200 || !m.data) return setSyncStatus('error', `Server error (${m.status})`);
     const at = m.data.updatedAt || 0;
     if (at === 0) { if (S.tasks.length || S.brands.length) return syncPush(); return setSyncStatus('ok'); }
@@ -2172,108 +2171,48 @@ async function syncPull(initial){
     applyRemote(full.data); notify('Updated from your other device ☁️');
   } catch(e){ setSyncStatus('offline', 'Offline — will retry'); }
 }
-const ACC_ERR = {bad_login:'Wrong email or password', name_taken:'That email already has an account — sign in instead', bad_email:'Enter a valid email address', bad_password:'Password needs at least 8 characters', bad_invite:'Wrong invite code', too_many:'Too many tries — wait a few minutes and try again', unauthorized:'Please sign in again'};
-async function accApi(body){
-  const r = await fetch('/api/account', {method:'POST', cache:'no-store', headers:{'Content-Type':'application/json', ...(SYNC.token ? {Authorization:'Bearer ' + SYNC.token} : {})}, body:JSON.stringify(body)});
-  let data = null; try { data = await r.json(); } catch(e){}
-  return {status:r.status, data};
-}
-const accMsg = r => r.status === 501 && r.data && r.data.error === 'not_configured' ? 'The server isn’t set up yet. Missing: ' + ((r.data && r.data.missing) || ['Upstash Redis']).join(', ') + '. Add it in Vercel and redeploy (see README).'
-  : (r.status === 404 || r.status === 405 || r.status === 501) ? 'No sync server here — open your deployed Vercel site' : ACC_ERR[r.data && r.data.error] || `Server error (${r.status})`;
-function sessionEnded(){ SYNC.token = ''; SYNC.at = 0; SYNC.dirty = false; SYNC.conflict = null; saveSync(); setSyncStatus('off', 'Your session ended — please sign in again'); notify('Signed out — please sign in again'); }
 function renderSync(){
-  const el = $('#sync'), st = SYNC.status, t = SYNC.lastAt ? new Date(SYNC.lastAt) : null, X = '<button class="x" id="syClose" aria-label="Close">✕</button>';
-  if (!SYNC.token) { const up = SYNC.view === 'up';
-    el.innerHTML = `${X}<h4>${up ? 'Create account' : 'Sign in'}</h4>
-    <p>${up ? 'Your tasks, timers and cat live in your account, so any phone or laptop can open them.' : 'Sign in to keep the same brands, tasks and cats on every device.'}</p>
-    <input id="syName" type="email" placeholder="Email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="80" aria-label="Email">
-    <input id="syPw" type="password" placeholder="${up ? 'Password (8+ characters)' : 'Password'}" autocomplete="${up ? 'new-password' : 'current-password'}" maxlength="200" aria-label="Password">
-    ${up ? `<input id="syInv" placeholder="Invite code" autocomplete="off" aria-label="Invite code" ${SYNC.info && SYNC.info.inviteRequired ? '' : 'hidden'}>` : ''}
+  const el = $('#sync'), st = SYNC.status, t = SYNC.lastAt ? new Date(SYNC.lastAt) : null;
+  if (!SYNC.pass) el.innerHTML = `<button class="x" id="syClose" aria-label="Close">✕</button><h4>Sync across devices</h4>
+    <p>Keep the same brands, tasks, timers and cats on your phone and laptop. Enter the passcode you set on your server.</p>
+    <input id="syIn" type="password" placeholder="Passcode" autocomplete="off" aria-label="Passcode">
     ${SYNC.msg ? `<div class="msg">${esc(SYNC.msg)}</div>` : ''}
-    <div class="row"><button class="cta" id="syGo" type="button">${up ? 'Create account' : 'Sign in'}</button><button class="lnk" id="syMode" type="button">${up ? 'I have an account' : 'New here? Create account'}</button></div>`; }
-  else if (SYNC.conflict) el.innerHTML = `${X}<h4>${SYNC.conflict.kind === 'first' ? 'Your account already has data' : 'Your devices disagree'}</h4>
-    <p>${SYNC.conflict.kind === 'first' ? 'Your account saved data from another device. A new device should usually use the cloud version.' : 'This device and the cloud both changed since the last sync. Pick the one to keep — the other is replaced.'}</p>
+    <div class="row"><button class="cta" id="syConnect" type="button">Connect</button></div>`;
+  else if (SYNC.conflict) el.innerHTML = `<button class="x" id="syClose" aria-label="Close">✕</button><h4>${SYNC.conflict.kind === 'first' ? 'The cloud already has data' : 'Your devices disagree'}</h4>
+    <p>${SYNC.conflict.kind === 'first' ? 'Another device already saved data. A new device should usually use the cloud version.' : 'This device and the cloud both changed since the last sync. Pick the one to keep — the other is replaced.'}</p>
     <div class="row"><button class="cta" id="syCloud" type="button">Use cloud data</button><button class="btn" id="syDevice" type="button">Use this device</button></div>`;
-  else if (SYNC.view === 'acct') el.innerHTML = `${X}<h4>Account</h4>
-    <p>Signed in as <b>${esc(SYNC.user)}</b>.</p>
-    <input id="syPw0" type="password" placeholder="Current password" autocomplete="current-password" maxlength="200" aria-label="Current password">
-    <input id="syPw1" type="password" placeholder="New password (to change it)" autocomplete="new-password" maxlength="200" aria-label="New password">
-    ${SYNC.msg ? `<div class="${SYNC.msgOk ? 'msg ok' : 'msg'}">${esc(SYNC.msg)}</div>` : ''}
-    <div class="row"><button class="cta" id="syChPw" type="button">Change password</button><button class="lnk dng" id="syDel" type="button">Delete account</button><button class="lnk" id="syBack" type="button">‹ Back</button></div>`;
-  else el.innerHTML = `${X}<h4>${st === 'ok' ? 'Synced ✓' : st === 'offline' ? 'Offline' : st === 'error' ? 'Sync problem' : 'Syncing…'}</h4>
-    <p>Signed in as <b>${esc(SYNC.user)}</b>. ${st === 'ok' && t ? `Last sync ${pad(t.getHours())}:${pad(t.getMinutes())}. Changes upload a moment after you make them and arrive on your other devices when you open or return to the page.` : esc(SYNC.msg || 'Working…')}</p>
+  else el.innerHTML = `<button class="x" id="syClose" aria-label="Close">✕</button><h4>${st === 'ok' ? 'Synced ✓' : st === 'offline' ? 'Offline' : st === 'error' ? 'Sync problem' : 'Syncing…'}</h4>
+    <p>${st === 'ok' && t ? `Last sync ${pad(t.getHours())}:${pad(t.getMinutes())}. Changes upload a moment after you make them and arrive on your other devices when you open or return to the page.` : esc(SYNC.msg || 'Working…')}</p>
     ${st === 'error' && SYNC.msg ? `<div class="msg">${esc(SYNC.msg)}</div>` : ''}
-    <div class="row"><button class="cta" id="syNow" type="button">Sync now</button><button class="btn" id="syOut" type="button">Sign out</button><button class="lnk" id="syAcct" type="button">Account</button></div>`;
+    <div class="row"><button class="cta" id="syNow" type="button">Sync now</button><button class="btn dng" id="syOff" type="button">Disconnect this device</button></div>`;
 }
-function openSync(show = $('#sync').hidden){
-  const el = $('#sync'); el.hidden = !show; if (!show) return;
-  if (SYNC.view === 'acct') { SYNC.view = 'in'; SYNC.msg = ''; }
-  renderSync(); ($('#syName') || $('#syPw0'))?.focus();
-  if (!SYNC.token && !SYNC.info) fetch('/api/account', {cache:'no-store'}).then(r => r.json()).then(d => { SYNC.info = d; const i = $('#syInv'); if (i) i.hidden = !d.inviteRequired; }).catch(() => {});
-}
-function syMsg(txt, ok){ SYNC.msg = txt; SYNC.msgOk = !!ok; let m = $('#sync .msg'); if (!m) { m = document.createElement('div'); $('#sync .row').before(m); } m.className = ok ? 'msg ok' : 'msg'; m.textContent = txt; }
-const hasLocal = () => S.tasks.length > 0 || S.brands.length > 0;
-function blankLocal(){ const f = seed(); SYNC_KEYS.forEach(k => S[k] = f[k]); S.brands = []; S.projects = []; S.tasks = []; S.timer = null; S.brand = '+'; S.open = null; S.edit = null; fixupRemote(); save(); render(); applyPet(); tickTimer(); }
-let syBusy = false;
-async function syncAuth(){
-  if (syBusy) return;
-  const up = SYNC.view === 'up', name = $('#syName').value.trim(), pw = $('#syPw').value;
-  if (!name) return $('#syName').focus(); if (!pw) return $('#syPw').focus();
-  syBusy = true; $('#syGo').disabled = true; syMsg('Working…');
-  try {
-    let r; try { r = await accApi({action:up ? 'signup' : 'login', name, password:pw, invite:$('#syInv')?.value || ''}); } catch(e){ return syMsg('Offline — try again when you’re connected'); }
-    if (r.status !== 200) { if (r.data && r.data.error === 'bad_invite') { const i = $('#syInv'); if (i) { i.hidden = false; i.focus(); } } return syMsg(accMsg(r)); }
-    const who = r.data.user.name;
-    if (SYNC.owner && SYNC.owner !== who && hasLocal() && await ask({title:`Switch to “${who}”?`, body:`This device still holds “${SYNC.owner}”’s tasks. They stay safe in that account. Start with a clean slate for “${who}”?`, ok:'Yes, start fresh', cancel:'No, keep them'})) blankLocal();
-    SYNC.token = r.data.token; SYNC.user = who; SYNC.owner = who; SYNC.at = 0; SYNC.dirty = false; SYNC.conflict = null; SYNC.hash = ''; SYNC.msg = ''; SYNC.view = 'in'; saveSync();
-    setSyncStatus('syncing'); await syncPull(true);
-    notify(up ? `Account created — welcome, ${who} ☁️` : `Signed in as ${who} ☁️`);
-    renderSync();
-  } finally { syBusy = false; const g = $('#syGo'); if (g) g.disabled = false; }
-}
-async function syncChangePw(){
-  const old = $('#syPw0').value, nw = $('#syPw1').value;
-  if (!old) return $('#syPw0').focus(); if (!nw) return $('#syPw1').focus();
-  let r; try { r = await accApi({action:'password', password:old, newPassword:nw}); } catch(e){ return syMsg('Offline — try again'); }
-  if (r.status !== 200) return syMsg(accMsg(r));
-  SYNC.token = r.data.token; saveSync(); $('#syPw0').value = $('#syPw1').value = ''; syMsg('Password changed. Your other devices will ask you to sign in again.', true); notify('Password changed 🔑');
+function openSync(show = $('#sync').hidden){ const el = $('#sync'); el.hidden = !show; if (show) { renderSync(); $('#syIn')?.focus(); } }
+async function syncConnect(){
+  const v = $('#syIn').value; if (!v) return $('#syIn').focus();
+  SYNC.pass = v; SYNC.at = 0; SYNC.dirty = false; SYNC.conflict = null; setSyncStatus('syncing');
+  await syncPull(true);
+  if (SYNC.status === 'error' || SYNC.status === 'offline') { const msg = SYNC.msg; SYNC.pass = ''; saveSync(); setSyncStatus('off', msg); return; }
+  saveSync();
+  if (SYNC.status === 'ok') notify('Cloud sync is on ☁️ — this device is connected');
+  renderSync();
 }
 $('#sync').addEventListener('click', async e => {
   const id = e.target.closest('button')?.id; if (!id) return;
   if (id === 'syClose') openSync(false);
-  if (id === 'syGo') syncAuth();
-  if (id === 'syMode') { SYNC.view = SYNC.view === 'up' ? 'in' : 'up'; SYNC.msg = ''; renderSync(); $('#syName').focus(); }
+  if (id === 'syConnect') syncConnect();
   if (id === 'syNow') { clearTimeout(syncPushT); if (SYNC.dirty) await syncPush(); else await syncPull(); }
   if (id === 'syCloud') { const c = SYNC.conflict; SYNC.conflict = null; applyRemote(c.remote); notify('Using the cloud version ☁️'); saveSync(); renderSync(); }
   if (id === 'syDevice') { SYNC.conflict = null; SYNC.dirty = true; await syncPush(true); if (SYNC.status === 'ok') notify('This device’s data replaced the cloud copy'); }
-  if (id === 'syAcct') { SYNC.view = 'acct'; SYNC.msg = ''; renderSync(); $('#syPw0').focus(); }
-  if (id === 'syBack') { SYNC.view = 'in'; SYNC.msg = ''; renderSync(); }
-  if (id === 'syChPw') syncChangePw();
-  if (id === 'syOut') {
-    if (!await ask({title:'Sign out?', body:'Your data stays on this device and in your account. This device just stops syncing.', ok:'Yes, sign out', danger:true})) return;
-    clearTimeout(syncPushT); if (SYNC.dirty) await syncPush().catch(() => {});
-    accApi({action:'logout'}).catch(() => {});
-    SYNC.token = ''; SYNC.at = 0; SYNC.dirty = false; SYNC.conflict = null; SYNC.hash = ''; SYNC.view = 'in'; saveSync(); setSyncStatus('off'); renderSync();
-  }
-  if (id === 'syDel') {
-    const pw = $('#syPw0').value; if (!pw) { syMsg('Type your current password first'); return $('#syPw0').focus(); }
-    if (!await ask({title:`Delete account “${SYNC.user}”?`, body:'Your cloud data and this account are removed for good and every device is signed out. The data on this device stays.', ok:'Yes, delete it', danger:true})) return;
-    let r; try { r = await accApi({action:'delete', password:pw}); } catch(e){ return syMsg('Offline — try again'); }
-    if (r.status !== 200) return syMsg(accMsg(r));
-    SYNC.token = ''; SYNC.user = ''; SYNC.owner = ''; SYNC.at = 0; SYNC.dirty = false; SYNC.conflict = null; SYNC.hash = ''; SYNC.view = 'in'; saveSync(); setSyncStatus('off'); renderSync(); notify('Account deleted');
-  }
+  if (id === 'syOff') { if (!await ask({title:'Disconnect this device?', body:'Your data stays here and in the cloud. This device just stops syncing.', ok:'Yes, disconnect', danger:true})) return; SYNC.pass = ''; SYNC.at = 0; SYNC.dirty = false; SYNC.conflict = null; saveSync(); setSyncStatus('off'); renderSync(); }
 });
-$('#sync').addEventListener('keydown', e => {
-  if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); if (e.target.id === 'syPw0' || e.target.id === 'syPw1') syncChangePw(); else syncAuth(); }
-  if (e.key === 'Escape') { e.stopPropagation(); openSync(false); }
-});
+$('#sync').addEventListener('keydown', e => { if (e.target.id === 'syIn' && e.key === 'Enter') { e.preventDefault(); syncConnect(); } if (e.key === 'Escape') { e.stopPropagation(); openSync(false); } });
 $('#syncBtn').onclick = $('#syncBtn2').onclick = () => openSync();
-setInterval(() => { if (SYNC.token && !document.hidden) syncPull(); }, 45000);
+setInterval(() => { if (SYNC.pass && !document.hidden) syncPull(); }, 45000);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) syncPull(); });
 addEventListener('online', () => { if (SYNC.dirty) syncPush(); else syncPull(); });
 addEventListener('focus', () => syncPull());
-setSyncStatus(SYNC.token ? 'syncing' : 'off');
-if (SYNC.token) syncPull();
+setSyncStatus(SYNC.pass ? 'syncing' : 'off');
+if (SYNC.pass) syncPull();
 
 /* ---------- theme (dark brown / cream, from the brand kit) ---------- */
 function pattern(stroke){
