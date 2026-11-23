@@ -11,7 +11,7 @@ It works on its own (data is saved in your browser). To use the **same data on s
    **That is the only required setup.** Redeploy once after connecting it.
 3. *(Optional)* **Settings → Environment Variables:** add `PURRGRESS_PASSCODE` = an invite code. If set, creating an account needs it,
    so strangers who find your URL can't sign up. Leave it out if you don't mind open sign-ups.
-4. Open your Vercel URL → click **☁** → **New here? Create account** (username or email + a password of 8+ characters).
+4. Open your Vercel URL → click **☁** → **New here? Create account** (your email + a password of 8+ characters).
    - First device: your current data is uploaded to the new account.
    - Other devices: **Sign in** → choose **Use cloud data**.
 

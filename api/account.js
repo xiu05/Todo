@@ -5,7 +5,9 @@
 const crypto = require('crypto');
 const { redis, missing, sameSecret, scrypt, auth, limited, ip, bodyOf, K, SESSION_SECS } = require('./_lib');
 
-const NAME_RE = /^[a-z0-9][a-z0-9._@+-]{2,39}$/;
+const EMAIL_RE = /^[a-z0-9._%+-]+@[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,}$/; // new accounts sign up with an email address
+const NAME_RE = /^[a-z0-9][a-z0-9._@+-]{2,39}$/; // older username-only accounts can still sign in
+const nameOk = (n) => n.length <= 80 && (EMAIL_RE.test(n) || NAME_RE.test(n));
 const normName = (n) => String(n || '').trim().toLowerCase();
 const pwOk = (p) => typeof p === 'string' && p.length >= 8 && p.length <= 200;
 const bad = (res, code, error, extra) => res.status(code).json({ error, ...extra });
@@ -41,7 +43,7 @@ module.exports = async (req, res) => {
     if (action === 'signup') {
       if (await limited('signup', ip(req), 10, 3600)) return bad(res, 429, 'too_many');
       const name = normName(b.name);
-      if (!NAME_RE.test(name)) return bad(res, 400, 'bad_name');
+      if (!EMAIL_RE.test(name) || name.length > 80) return bad(res, 400, 'bad_email');
       if (!pwOk(b.password)) return bad(res, 400, 'bad_password');
       if (invite && !sameSecret(b.invite || '', invite)) return bad(res, 403, 'bad_invite');
       const salt = crypto.randomBytes(16);
@@ -54,7 +56,7 @@ module.exports = async (req, res) => {
     if (action === 'login') {
       const name = normName(b.name);
       if (await limited('login-ip', ip(req), 60, 900) || await limited('login', name, 8, 900)) return bad(res, 429, 'too_many');
-      const raw = NAME_RE.test(name) ? await redis(['GET', K.user(name)]) : null;
+      const raw = nameOk(name) ? await redis(['GET', K.user(name)]) : null;
       const user = raw ? JSON.parse(raw) : null;
       if (!(await checkPassword(user, String(b.password || '')))) return bad(res, 401, 'bad_login');
       await redis(['DEL', K.rl('login', name)]);

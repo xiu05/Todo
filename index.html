@@ -2172,7 +2172,7 @@ async function syncPull(initial){
     applyRemote(full.data); notify('Updated from your other device ☁️');
   } catch(e){ setSyncStatus('offline', 'Offline — will retry'); }
 }
-const ACC_ERR = {bad_login:'Wrong username or password', name_taken:'That username is taken — pick another or sign in', bad_name:'Username: 3–40 letters, numbers or . _ - @ +', bad_password:'Password needs at least 8 characters', bad_invite:'Wrong invite code', too_many:'Too many tries — wait a few minutes and try again', unauthorized:'Please sign in again'};
+const ACC_ERR = {bad_login:'Wrong email or password', name_taken:'That email already has an account — sign in instead', bad_email:'Enter a valid email address', bad_password:'Password needs at least 8 characters', bad_invite:'Wrong invite code', too_many:'Too many tries — wait a few minutes and try again', unauthorized:'Please sign in again'};
 async function accApi(body){
   const r = await fetch('/api/account', {method:'POST', cache:'no-store', headers:{'Content-Type':'application/json', ...(SYNC.token ? {Authorization:'Bearer ' + SYNC.token} : {})}, body:JSON.stringify(body)});
   let data = null; try { data = await r.json(); } catch(e){}
@@ -2186,7 +2186,7 @@ function renderSync(){
   if (!SYNC.token) { const up = SYNC.view === 'up';
     el.innerHTML = `${X}<h4>${up ? 'Create account' : 'Sign in'}</h4>
     <p>${up ? 'Your tasks, timers and cat live in your account, so any phone or laptop can open them.' : 'Sign in to keep the same brands, tasks and cats on every device.'}</p>
-    <input id="syName" placeholder="Username or email" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="40" aria-label="Username or email">
+    <input id="syName" type="email" placeholder="Email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="80" aria-label="Email">
     <input id="syPw" type="password" placeholder="${up ? 'Password (8+ characters)' : 'Password'}" autocomplete="${up ? 'new-password' : 'current-password'}" maxlength="200" aria-label="Password">
     ${up ? `<input id="syInv" placeholder="Invite code" autocomplete="off" aria-label="Invite code" ${SYNC.info && SYNC.info.inviteRequired ? '' : 'hidden'}>` : ''}
     ${SYNC.msg ? `<div class="msg">${esc(SYNC.msg)}</div>` : ''}
