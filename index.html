@@ -332,6 +332,7 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 .pcat.sleep .pbtn svg{animation:breathe 3.2s ease-in-out infinite} @keyframes breathe{50%{transform:scaleY(1.04)}}
 .pbtn svg{transform-origin:50% 100%}
 .peyes circle{animation:blink 5s infinite;transform-box:fill-box;transform-origin:center}
+#petCard.compact>:not(.pc-h){display:none}
 #petCard .pc-sec{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
 #petCard h5{margin:0 0 6px;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
 .pc-tools{display:flex;gap:6px;flex-wrap:wrap}
@@ -1888,6 +1889,7 @@ function closePetCard(){ $('#petCard').hidden = true; clearTimeout(petCardT); }
 function resetCardTimer(){ clearTimeout(petCardT); petCardT = setTimeout(() => { if (!$('#petCard').matches(':hover') && !$('#petCard').contains(document.activeElement)) closePetCard(); else resetCardTimer(); }, 9000); }
 let lookOpen = false, lookWho = 'me';
 function renderPetCard(editing){
+  $('#petCard').classList.toggle('compact', editing === 'pet' && !S.pet.name); // first-run naming: just the name box, nothing covering your page
   const p = S.pet, st = petStage(), next = STAGE_AT[st + 1], f = Math.round(p.love / 20), fr = p.friend;
   $('#pcHead').innerHTML = editing === 'pet'
     ? `<input id="pcIn" maxlength="16" placeholder="Give your cat a name" value="${esc(p.name)}" autocomplete="off" aria-label="Cat name"><button class="cta" id="pcSave" type="button">Save</button>`
