@@ -332,15 +332,37 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
 .pcat.sleep .pbtn svg{animation:breathe 3.2s ease-in-out infinite} @keyframes breathe{50%{transform:scaleY(1.04)}}
 .pbtn svg{transform-origin:50% 100%}
 .peyes circle{animation:blink 5s infinite;transform-box:fill-box;transform-origin:center}
-.pcat .pfill{fill:var(--card)}
-.pcat.friend .pfill{fill:color-mix(in srgb,var(--orange) 42%,var(--card))}
+#petCard .pc-sec{margin-top:10px;padding-top:8px;border-top:1px dashed var(--line)}
+#petCard h5{margin:0 0 6px;font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.pc-tools{display:flex;gap:6px;flex-wrap:wrap}
+.tool{font:800 13px var(--disp);padding:6px 12px;border-radius:99px;border:1.5px solid var(--ink);white-space:nowrap}
+.tool:hover{background:var(--ink);color:var(--card)} .tool small{opacity:.7;font-weight:700}
+.pc-hint{margin-top:6px;color:var(--muted);font:500 11px/1.5 var(--mono);text-transform:none;letter-spacing:.01em}
+.pc-lookt{font:800 13px var(--disp);padding:5px 12px;border-radius:99px;border:1.5px solid var(--line)} .pc-lookt:hover,.pc-lookt.on{border-color:var(--ink)}
+.pc-opts{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.fur{width:26px;height:26px;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1.5px var(--line);background:var(--c)}
+.fur.auto{background:conic-gradient(var(--card) 0 50%,var(--ink) 0)}
+.fur.on{box-shadow:0 0 0 2.5px var(--ink)}
+.opt{font:700 12px var(--disp);padding:4px 10px;border-radius:99px;border:1.5px solid var(--line)}
+.opt:hover{border-color:var(--ink)} .opt.on{background:var(--ink);color:var(--card);border-color:var(--ink)} .opt.lock{opacity:.5}
+.pcat .pfill{fill:var(--fur,var(--card))}
+.pcat .peyes{transform:translate(var(--ex,0px),var(--ey,0px));transition:transform .1s}
+.pbtn{touch-action:none;cursor:grab}
+.pcat.held{z-index:60} .pcat.held .pbtn{cursor:grabbing}
+.pcat.held .pbtn svg{animation:dangle .55s ease-in-out infinite;transform-origin:50% 0}
+@keyframes dangle{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+.pcat.fall{transition:transform var(--dur,.4s) cubic-bezier(.55,0,1,.45)}
+.toy{position:fixed;z-index:44;font-size:26px;line-height:1;pointer-events:none;transition:top .5s cubic-bezier(.55,0,1,.45),left .7s ease-out}
+.toy svg{width:30px;display:block} .toy.roll svg{animation:spin .6s linear infinite}
+#laser{position:fixed;z-index:120;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:var(--red);box-shadow:0 0 0 4px color-mix(in srgb,var(--red) 30%,transparent),0 0 14px 4px var(--red);pointer-events:none}
+body[data-tool]{cursor:crosshair} body[data-tool=laser]{cursor:none}
 .pcat .pzz{font:500 11px var(--mono);fill:var(--muted);animation:zz 2.4s ease-in-out infinite}
 .pbub{position:absolute;bottom:100%;left:50%;transform:translate(-50%,8px);margin-bottom:4px;background:var(--ink);color:var(--card);font:500 12px/1.3 var(--mono);padding:7px 11px;border-radius:12px 12px 12px 3px;
   width:max-content;max-width:200px;opacity:0;transition:.25s;pointer-events:none;text-align:left}
 .pbub.on{opacity:1;transform:translate(-50%,0)}
 .pcat.friend .pbub{background:var(--yellow);color:#2B2019}
 .heart{position:fixed;z-index:46;pointer-events:none;color:var(--red);font-size:18px;animation:paw .95s ease-out forwards}
-#petCard{position:fixed;bottom:84px;left:260px;z-index:66;width:262px;background:var(--card);border:2px solid var(--ink);border-radius:20px;box-shadow:var(--shadow);padding:14px 16px 14px;animation:drop .2s ease}
+#petCard{position:fixed;bottom:84px;left:260px;z-index:66;width:292px;max-height:calc(100vh - 110px);overflow:auto;background:var(--card);border:2px solid var(--ink);border-radius:20px;box-shadow:var(--shadow);padding:14px 16px 14px;animation:drop .2s ease}
 #petCard[hidden]{display:none}
 .pc-h{display:flex;align-items:center;gap:8px;justify-content:space-between}
 .pc-h b{font:900 22px/1.1 var(--disp);letter-spacing:-.03em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -569,6 +591,8 @@ footer{margin-top:26px;text-align:center;color:var(--muted)}
   <div class="pc-st mono" id="pcSt"></div>
   <div id="pcLove" aria-label="Affection"></div>
   <div class="pc-meta mono" id="pcMeta"></div>
+  <div class="pc-sec" id="pcTools"></div>
+  <div class="pc-sec" id="pcLook"></div>
   <div class="pc-fr" id="pcFr"></div>
   <div class="pc-act"><button class="cta" id="pcFeed" type="button">Give treat 🐟</button><button class="btn" id="pcHide" type="button">Hide cat</button></div>
 </div>
@@ -686,6 +710,9 @@ S.music = S.music || {tracks:[], idx:0};
 S.pet = Object.assign({on:true, name:'', love:30, treats:0, done:0, seeded:false, asked:false}, S.pet || {});
 S.pet.friend = Object.assign({on:true, name:'Pudding', seen:false}, S.pet.friend || {});
 if (!S.pet.seeded) { S.tasks.forEach(t => { if (t.done) { t.credited = true; S.pet.done++; } }); S.pet.seeded = true; }
+S.pet.look = Object.assign({fur:'auto', pattern:'plain', acc:null}, S.pet.look || {});
+if (S.pet.look.acc === null) S.pet.look.acc = S.pet.done >= 20 ? 'crown' : S.pet.done >= 5 ? 'bow' : 'none';
+S.pet.friend.look = Object.assign({fur:'#E8914F', pattern:'stripes', acc:'none'}, S.pet.friend.look || {});
 S.projects.forEach(p => { p.sessions = p.sessions || []; });
 S.pomoSet = Object.assign({on:false, f:25, b:5, l:15, every:4}, S.pomoSet || {});
 if (S.timer && !S.projects.some(p => p.id === S.timer.pid)) S.timer = null;
@@ -1572,6 +1599,7 @@ addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     if (cal) return closeCal();
     if (qaOpen) return closeQA();
+    if (tool) return setTool(null);
     if (!$('#sync').hidden) return openSync(false);
     if (!$('#petCard').hidden) return closePetCard();
     if (openId) return tryCloseDrawer();
@@ -1631,56 +1659,83 @@ const petName = () => S.pet.name || 'Your cat';
 const delay = ms => new Promise(res => setTimeout(res, ms));
 const clampN = (v, a, b) => Math.max(a, Math.min(b, v));
 const CATS = []; let petEvt = 0, petEvtT = 0, petIdleAt = Date.now(), petCardT = 0, petQuick = 0;
-function petSVG(pose, stage, friend){
-  const sit = ['sit', 'happy', 'focus', 'groom'].includes(pose);
-  const eye = (x, y) => pose === 'sleep' ? `<path d="M${x - 3.5} ${y}q3.5 3.5 7 0" stroke-width="2.2"/>`
-    : (pose === 'happy' || pose === 'groom' || pose === 'play') ? `<path d="M${x - 3.5} ${y + 1}q3.5-5 7 0" stroke-width="2.2"/>`
-    : pose === 'focus' ? `<path d="M${x - 3.5} ${y}h7" stroke-width="2.4"/>`
-    : `<g class="peyes"><circle cx="${x}" cy="${y}" r="2.3" fill="currentColor" stroke="none"/></g>`;
+const FURS = [['auto', 'Theme'], ['#F2EAD9', 'Cream'], ['#E8914F', 'Orange'], ['#9AA0A8', 'Grey'], ['#2B2B30', 'Black'], ['#7B4B36', 'Chocolate'], ['#FBF8F2', 'White'], ['#C9A27E', 'Fawn']];
+const PATTERNS = [['plain', 'Plain'], ['stripes', 'Tabby'], ['spots', 'Spots'], ['tux', 'Tuxedo']];
+const ACCS = [['none', 'None', 0], ['bow', 'Bow tie', 0], ['bell', 'Bell', 0], ['glasses', 'Glasses', 0], ['party', 'Party hat', 0], ['bandana', 'Bandana', 1], ['crown', 'Crown', 2]];
+const mixHex = (a, b, t) => { const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16), ch = sh => Math.round(((pa >> sh) & 255) * (1 - t) + ((pb >> sh) & 255) * t); return '#' + [16, 8, 0].map(sh => ch(sh).toString(16).padStart(2, '0')).join(''); };
+const lumOf = h => { const n = parseInt(h.slice(1), 16); return (.299 * (n >> 16) + .587 * ((n >> 8) & 255) + .114 * (n & 255)) / 255; };
+function furVars(look){
+  if (!look || !/^#[0-9a-f]{6}$/i.test(look.fur)) return '';
+  const dark = lumOf(look.fur) < .45;
+  return `--fur:${look.fur};--eye:${dark ? '#F2EAD9' : '#2B2019'};--pat:${dark ? mixHex(look.fur, '#FFFFFF', .3) : mixHex(look.fur, '#000000', .32)};`;
+}
+function petSVG(pose, stage, friend, look){
+  look = look || {fur:'auto', pattern:'plain', acc:'none'};
+  if (pose === 'fall') pose = 'held';
+  const E = 'style="stroke:var(--eye,currentColor)"', EF = 'style="fill:var(--eye,currentColor)"', P = 'style="stroke:var(--pat,currentColor)"', PF = 'style="fill:var(--pat,currentColor)"';
+  const pat = look.pattern;
+  const eye = (x, y) => pose === 'sleep' ? `<path ${E} d="M${x - 3.5} ${y}q3.5 3.5 7 0" stroke-width="2.2"/>`
+    : (pose === 'happy' || pose === 'groom' || pose === 'play') ? `<path ${E} d="M${x - 3.5} ${y + 1}q3.5-5 7 0" stroke-width="2.2"/>`
+    : pose === 'focus' ? `<path ${E} d="M${x - 3.5} ${y}h7" stroke-width="2.4"/>`
+    : pose === 'held' ? `<circle cx="${x}" cy="${y}" r="3.4" ${EF} stroke="none"/><circle cx="${x + 1}" cy="${y - 1}" r="1" fill="#fff" stroke="none"/>`
+    : `<g class="peyes"><circle cx="${x}" cy="${y}" r="2.3" ${EF} stroke="none"/></g>`;
+  const acc = {
+    bow: '<path d="M-5 11l-7-3.5v7zM-5 11l7-3.5v7z" fill="var(--orange)" stroke-width="1.8"/><circle cx="-5" cy="11" r="1.8" fill="currentColor" stroke="none"/>',
+    bell: '<path d="M-13 8q9 7 18 0" stroke="var(--red)" stroke-width="2.4"/><circle cx="-4" cy="14.5" r="2.8" fill="var(--yellow)" stroke-width="1.4"/>',
+    glasses: '<circle cx="2" cy="-2" r="4.7" stroke-width="1.6"/><circle cx="11" cy="-2" r="4.7" stroke-width="1.6"/><path d="M15.7 -2.5l6 -2" stroke-width="1.5"/>',
+    party: '<path d="M-7 -14L2 -34L10 -14Z" fill="var(--orange)" stroke-width="1.8"/><path d="M-4 -21l11 0M-1 -27l6 0" stroke-width="1.4"/><circle cx="2" cy="-35" r="2.4" fill="var(--yellow)" stroke-width="1.2"/>',
+    bandana: '<path d="M-14 7L9 7L-3 22Z" fill="var(--red)" stroke-width="1.8"/><circle cx="-3" cy="12" r="1" fill="#fff" stroke="none"/><circle cx="-7" cy="10" r="1" fill="#fff" stroke="none"/><circle cx="1" cy="10" r="1" fill="#fff" stroke="none"/>',
+    crown: '<path d="M-7 -14L-6 -23L0 -18L6 -23L7 -14Z" fill="var(--yellow)" stroke-width="1.8"/>',
+  }[look.acc] || '';
+  const headPat = pat === 'stripes' ? `<path ${P} d="M-4 -14v5M0 -15v6M4 -14v5" stroke-width="2"/>`
+    : pat === 'spots' ? `<circle cx="-9" cy="3" r="2.6" ${PF} stroke="none"/><circle cx="8" cy="-10" r="2.2" ${PF} stroke="none"/>`
+    : pat === 'tux' ? '<path d="M9 4C13 2 18 4 17 8C15 12 9 12 6 10Z" fill="#FBF8F2" stroke="none"/>' : '';
   const head = (x, y, rot) => `<g class="phead" transform="translate(${x} ${y}) rotate(${rot})">
       <path class="pfill" d="M-16 2C-16 -10 -8 -16 2 -16C12 -16 18 -9 17 0C16 8 8 12 0 12C-10 12 -16 8 -16 2Z"/>
       <path class="pfill" d="M-12 -10L-14 -22L-4 -15Z"/><path class="pfill" d="M4 -16L10 -26L15 -12Z"/>
-      ${friend ? '<path d="M-4 -14v5M0 -15v6M4 -14v5" stroke-width="2"/>' : ''}
+      ${headPat}
       ${eye(2, -2)}${eye(11, -2)}
-      <path d="M15 3l3 0l-1.5 2.2z" fill="currentColor" stroke-width="1.4"/>
-      <path d="M14 7q-2 3-5 2M14 7q2 3 5 2" stroke-width="1.8"/>
+      <path d="M15 3l3 0l-1.5 2.2z" ${EF} ${E} stroke-width="1.4"/>
+      <path ${E} d="M14 7q-2 3-5 2M14 7q2 3 5 2" stroke-width="1.8"/>
       <path d="M16 5l10-3M16 7l10 3" stroke-width="1.6"/>
-      ${!friend && stage >= 1 ? '<path d="M-5 11l-7-3.5v7zM-5 11l7-3.5v7z" fill="var(--orange)" stroke-width="1.8"/>' : ''}
-      ${!friend && stage >= 2 ? '<path d="M-7 -14L-6 -23L0 -18L6 -23L7 -14Z" fill="var(--yellow)" stroke-width="1.8"/>' : ''}
+      ${acc}
     </g>`;
   const leg = (x, cls, far, extra = '') => `<g class="leg ${cls} ${far ? 'pfar' : ''}" ${extra} style="transform-origin:${x}px 46px"><path d="M${x} 46V62" stroke-width="4.6"/><path d="M${x - 2.5} 63.5h6" stroke-width="3"/></g>`;
-  const tail = (d, ox, oy) => `<g class="ptail" style="transform-origin:${ox}px ${oy}px"><path d="${d}" stroke-width="3.6"/>${friend ? '<path d="M4 20l5-2M2 14l5-3" stroke-width="2"/>' : ''}</g>`;
-  const stripes = friend ? '<path d="M30 21v6M38 21v6M46 22v6" stroke-width="2.2"/>' : '';
-  const body = `<path class="pfill" d="M12 36C12 24 22 20 36 20L58 22C66 24 66 42 58 46L22 48C16 48 12 42 12 36Z"/>${stripes}`;
+  const tail = (d, ox, oy) => `<g class="ptail" style="transform-origin:${ox}px ${oy}px"><path d="${d}" stroke-width="3.6"/>${pat === 'stripes' ? `<path ${P} d="M4 20l5-2M2 14l5-3" stroke-width="2"/>` : ''}</g>`;
+  const bodyPat = kind => pat === 'stripes' ? { h:`<path ${P} d="M30 21v6M38 21v6M46 22v6" stroke-width="2.2"/>`, s:`<path ${P} d="M22 38l9-3M20 46l11-2" stroke-width="2.2"/>`, l:`<path ${P} d="M26 40v6M34 39v6M42 39v6" stroke-width="2.2"/>` }[kind]
+    : pat === 'spots' ? { h:`<circle cx="30" cy="32" r="3.2" ${PF} stroke="none"/><circle cx="44" cy="28" r="2.6" ${PF} stroke="none"/><circle cx="50" cy="39" r="2.2" ${PF} stroke="none"/>`, s:`<circle cx="26" cy="44" r="3" ${PF} stroke="none"/><circle cx="35" cy="34" r="2.6" ${PF} stroke="none"/>`, l:`<circle cx="26" cy="48" r="3" ${PF} stroke="none"/><circle cx="46" cy="46" r="2.6" ${PF} stroke="none"/>` }[kind]
+    : pat === 'tux' ? { h:'<path d="M56 24C65 27 65 41 58 45C54 41 54 29 56 24Z" fill="#FBF8F2" stroke="none"/>', s:'<path d="M50 30C58 32 59 52 58 62L51 62C49 50 49 38 50 30Z" fill="#FBF8F2" stroke="none"/>', l:'<path d="M62 44C70 44 74 55 71 62L58 62Z" fill="#FBF8F2" stroke="none"/>' }[kind] : '';
+  const body = `<path class="pfill" d="M12 36C12 24 22 20 36 20L58 22C66 24 66 42 58 46L22 48C16 48 12 42 12 36Z"/>${bodyPat('h')}`;
   let inner;
   if (pose === 'walk' || pose === 'run') {
     inner = `${leg(30, 'legB', true)}${leg(52, 'legA', true)}${tail('M12 32C0 30-3 16 6 8', 12, 32)}${body}${leg(24, 'legA')}${leg(58, 'legB')}${head(76, 25, 0)}`;
   } else if (pose === 'eat') {
     inner = `${leg(30, '', true)}${leg(52, '', true)}${tail('M12 32C0 34-4 22 4 14', 12, 32)}${body}${leg(24, '')}${leg(58, '')}
       <g class="chew">${head(88, 45, 38)}</g>
-      <path class="pfill" d="M84 60h22l-3 9H87z" stroke-width="2.6"/><circle cx="92" cy="59" r="1.8" fill="currentColor" stroke="none"/><circle cx="98" cy="58" r="1.8" fill="currentColor" stroke="none"/><circle cx="103" cy="59.5" r="1.6" fill="currentColor" stroke="none"/>`;
+      <path class="pfill" d="M84 60h22l-3 9H87z" stroke-width="2.6" style="fill:var(--card)"/><circle cx="92" cy="59" r="1.8" fill="currentColor" stroke="none"/><circle cx="98" cy="58" r="1.8" fill="currentColor" stroke="none"/><circle cx="103" cy="59.5" r="1.6" fill="currentColor" stroke="none"/>`;
   } else if (pose === 'play') {
     inner = `<g class="rock" style="transform-origin:40px 46px">${leg(30, '', true)}${tail('M12 32C0 28-2 14 8 8', 12, 32)}${body}${leg(24, '')}
       ${leg(52, '', true)}<g class="swat" style="transform-origin:58px 46px"><path d="M58 46L74 55" stroke-width="4.6"/></g>${head(78, 36, 18)}</g>
       <g class="ball"><circle cx="100" cy="58" r="8" fill="var(--yellow)" stroke-width="2.4"/><path d="M93 56q7 5 14 0M94 62q6 3 11-2" stroke-width="1.6"/></g>`;
   } else if (pose === 'sleep') {
-    inner = `${tail('M10 60C0 62-2 48 12 50', 12, 56)}<path class="pfill" d="M8 62C6 46 18 38 38 38L66 40C80 42 82 54 78 62Z"/>${friend ? '<path d="M26 40v6M34 39v6M42 39v6" stroke-width="2.2"/>' : ''}${head(66, 48, 10)}<path class="pfill" d="M68 62q4-5 12 0" stroke-width="2.6"/><text class="pzz" x="86" y="30">z</text><text class="pzz" x="96" y="20" style="animation-delay:.9s">z</text>`;
-  } else { // sit / happy / focus / groom
-    inner = `${tail('M16 63C0 66-4 50 8 48', 14, 62)}<path class="pfill" d="M14 64C8 46 16 28 34 24C48 21 58 28 60 40C61 50 60 58 60 64Z"/>${friend ? '<path d="M22 38l9-3M20 46l11-2" stroke-width="2.2"/>' : ''}
+    inner = `${tail('M10 60C0 62-2 48 12 50', 12, 56)}<path class="pfill" d="M8 62C6 46 18 38 38 38L66 40C80 42 82 54 78 62Z"/>${bodyPat('l')}${head(66, 48, 10)}<path class="pfill" d="M68 62q4-5 12 0" stroke-width="2.6"/><text class="pzz" x="86" y="30">z</text><text class="pzz" x="96" y="20" style="animation-delay:.9s">z</text>`;
+  } else { // sit / happy / focus / groom / held
+    inner = `${tail('M16 63C0 66-4 50 8 48', 14, 62)}<path class="pfill" d="M14 64C8 46 16 28 34 24C48 21 58 28 60 40C61 50 60 58 60 64Z"/>${bodyPat('s')}
       <path d="M18 62q4-13 16-11M18 64h14" stroke-width="2.4"/>
       <path d="M55 40V62M64 40V62" stroke-width="3.8"/><path d="M52 63.5h6M61 63.5h6" stroke-width="3"/>
       ${pose === 'groom' ? '<g class="lick" style="transform-origin:62px 40px"><path d="M62 40L68 24" stroke-width="4.4"/></g>' : ''}
       ${head(58, 13, pose === 'groom' ? 12 : 0)}`;
   }
-  return `<svg viewBox="0 0 112 72" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g class="pbody">${inner}</g></svg>`;
+  return `<svg viewBox="0 0 112 72" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="${furVars(look)}"><g class="pbody">${inner}</g></svg>`;
 }
 function mkCat(friend){
   const el = document.createElement('div'); el.className = 'pcat' + (friend ? ' friend' : ''); el.hidden = true; el.id = friend ? 'pet2' : 'pet';
   el.innerHTML = `<div class="pbub" id="${friend ? 'petBubble2' : 'petBubble'}" role="status"></div><button class="pbtn" id="${friend ? 'petBtn2' : 'petBtn'}" aria-label="${friend ? 'Your cat’s friend' : 'Your pet cat'} — click to pet"></button>`;
   document.body.appendChild(el);
   const c = {friend, el, btn:el.querySelector('.pbtn'), bub:el.querySelector('.pbub'), x:0, y:0, dir:1, pose:'sit', busy:false, loop:0, bt:0, placed:false};
-  c.btn.onclick = () => friend ? friendClick(c) : (petIdleAt = Date.now(), petReact('pet'), openPetCard(false));
-  CATS.push(c); return c;
+  c.btn.onclick = () => { if (c.suppressClick) return; friend ? friendClick(c) : (petIdleAt = Date.now(), petReact('pet'), openPetCard(false)); };
+  c.btn.ondblclick = () => { if (!c.busy) { setPose(c, 'happy'); heartsOn(c, 2); catSpeak(c, 'hop!'); setTimeout(() => backToSit(c), 1500); } };
+  enableDrag(c); CATS.push(c); return c;
 }
 const catBase = c => (c.friend ? 52 : [48, 58, 64][petStage()]) * (innerWidth < 760 ? .9 : 1);
 const catW = c => catBase(c) * 1.55;
@@ -1689,7 +1744,8 @@ const catShown = c => S.pet.on && (!c.friend || S.pet.friend.on);
 const bounds = c => ({x0:8, x1:Math.max(60, innerWidth - catW(c) - 8), y0:96, y1:Math.max(120, innerHeight - catH(c) - 2)});
 const nameOf = c => c.friend ? S.pet.friend.name : petName();
 function setPose(c, p){
-  c.pose = p; c.el.className = 'pcat' + (c.friend ? ' friend ' : ' ') + p; c.btn.innerHTML = petSVG(p, petStage(), c.friend);
+  if (c.held && p !== 'held') return;
+  c.pose = p; c.el.className = 'pcat' + (c.friend ? ' friend ' : ' ') + p; c.btn.innerHTML = petSVG(p, petStage(), c.friend, c.friend ? S.pet.friend.look : S.pet.look);
   c.btn.style.setProperty('--w', catW(c) + 'px'); c.btn.style.setProperty('--dir', c.dir);
 }
 function groundish(c){ return c.y > innerHeight - catH(c) - 130; }
@@ -1698,6 +1754,7 @@ function place(c, x, y){
   c.el.style.transform = `translate(${c.x}px,${c.y}px)`; c.btn.style.pointerEvents = groundish(c) ? 'auto' : 'none';
 }
 async function walkTo(c, x, y, speed = 46){
+  if (c.held) return;
   const b = bounds(c); x = clampN(x, b.x0, b.x1); y = clampN(y, b.y0, b.y1);
   const dx = x - c.x, dist = Math.hypot(dx, y - c.y); if (dist < 5) return;
   const dur = Math.max(.5, dist / speed); if (Math.abs(dx) > 6) c.dir = dx > 0 ? 1 : -1;
@@ -1763,10 +1820,10 @@ async function wander(c){
 }
 async function tickCat(c){
   clearTimeout(c.loop); if (!catShown(c)) return;
-  if (c.busy) { c.loop = setTimeout(() => tickCat(c), 1500); return; }
+  if (c.busy || c.held) { c.loop = setTimeout(() => tickCat(c), 1500); return; }
   c.busy = true; let w = 5000;
   try { w = await wander(c); } catch(e){}
-  c.busy = false; c.loop = setTimeout(() => tickCat(c), w);
+  if (!c.held) c.busy = false; c.loop = setTimeout(() => tickCat(c), w);
 }
 
 /* together: they meet, chase, nap, groom and play */
@@ -1829,6 +1886,7 @@ function openPetCard(editing){
 }
 function closePetCard(){ $('#petCard').hidden = true; clearTimeout(petCardT); }
 function resetCardTimer(){ clearTimeout(petCardT); petCardT = setTimeout(() => { if (!$('#petCard').matches(':hover') && !$('#petCard').contains(document.activeElement)) closePetCard(); else resetCardTimer(); }, 9000); }
+let lookOpen = false, lookWho = 'me';
 function renderPetCard(editing){
   const p = S.pet, st = petStage(), next = STAGE_AT[st + 1], f = Math.round(p.love / 20), fr = p.friend;
   $('#pcHead').innerHTML = editing === 'pet'
@@ -1837,6 +1895,14 @@ function renderPetCard(editing){
   $('#pcSt').textContent = `${STAGES[st]} · level ${st + 1}`;
   $('#pcLove').textContent = '♥'.repeat(f) + '♡'.repeat(5 - f);
   $('#pcMeta').innerHTML = `🐟 ${p.treats} treat${p.treats === 1 ? '' : 's'} · ${p.done} task${p.done === 1 ? '' : 's'} done${next ? `<br>${next - p.done} more to become a ${STAGES[st + 1]}` : '<br>fully grown & fancy 👑'}`;
+  $('#pcTools').innerHTML = `<h5>Play</h5><div class="pc-tools"><button class="tool" id="tlTreat" type="button">🐟 Toss treat <small>${p.treats}</small></button><button class="tool" id="tlYarn" type="button">🧶 Yarn</button><button class="tool" id="tlLaser" type="button">🔴 Laser</button></div>
+    <div class="pc-hint">Pick a toy, then click anywhere. Drag a cat to pick it up, rub it for purrs.</div>`;
+  const L = lookWho === 'friend' && fr.on ? fr.look : p.look, who = lookWho === 'friend' && fr.on ? 'friend' : 'me';
+  $('#pcLook').innerHTML = `<h5>Look <button class="pc-lookt ${lookOpen ? 'on' : ''}" id="pcLookT" type="button">🎨 ${lookOpen ? 'Done' : 'Customize'}</button></h5>` + (lookOpen ? `
+    ${fr.on ? `<div class="pc-opts"><button class="opt ${who === 'me' ? 'on' : ''}" data-who="me" type="button">${esc(petName())}</button><button class="opt ${who === 'friend' ? 'on' : ''}" data-who="friend" type="button">${esc(fr.name)}</button></div>` : ''}
+    <div class="pc-opts">${FURS.map(([c, n]) => `<button class="fur ${c === 'auto' ? 'auto' : ''} ${L.fur === c ? 'on' : ''}" data-fur="${c}" style="--c:${c === 'auto' ? 'var(--card)' : c}" title="${n}" aria-label="Fur ${n}" type="button"></button>`).join('')}</div>
+    <div class="pc-opts">${PATTERNS.map(([k, n]) => `<button class="opt ${L.pattern === k ? 'on' : ''}" data-pat="${k}" type="button">${n}</button>`).join('')}</div>
+    <div class="pc-opts">${ACCS.map(([k, n, lv]) => `<button class="opt ${L.acc === k ? 'on' : ''} ${petStage() < lv ? 'lock' : ''}" data-acc="${k}" type="button" title="${petStage() < lv ? 'Unlocks at level ' + (lv + 1) : n}">${petStage() < lv ? '🔒 ' : ''}${n}</button>`).join('')}</div>` : '');
   $('#pcFr').innerHTML = !fr.on ? `<span>No friend visiting</span><button class="btn sm" id="pcFrToggle" type="button">Invite a friend</button>`
     : editing === 'friend' ? `<input id="pcFrIn" maxlength="16" value="${esc(fr.name)}" autocomplete="off" aria-label="Friend's name"><button class="cta sm" id="pcFrSave" type="button">Save</button>`
     : `<span>🧡 Friend: <b>${esc(fr.name)}</b></span><span><button class="pcr" id="pcFrRename" type="button">✎</button> <button class="pcr" id="pcFrToggle" type="button">Send home</button></span>`;
@@ -1851,8 +1917,18 @@ async function savePetName(kind){
   save(); renderPetCard(false); resetCardTimer();
   notify(old ? `Cat ${q(old)} has been renamed to ${q(v)}` : `Your cat is now called ${q(v)}`); catSpeak(CATS[friend ? 1 : 0], `${v}! I like it 😸`);
 }
+function setLook(patch){
+  const fr = lookWho === 'friend' && S.pet.friend.on, L = fr ? S.pet.friend.look : S.pet.look; Object.assign(L, patch); save();
+  CATS.forEach(c => { if (catShown(c)) setPose(c, c.pose); }); renderPetCard(); catSpeak(CATS[fr ? 1 : 0], pick(['ooh, new look!', 'do I look fancy?', 'meow-velous ✨']), 2200);
+}
 $('#petCard').addEventListener('click', e => {
-  const id = e.target.closest('button')?.id; resetCardTimer();
+  const btn = e.target.closest('button'), id = btn?.id; resetCardTimer();
+  if (btn && btn.dataset.fur) return setLook({fur:btn.dataset.fur});
+  if (btn && btn.dataset.pat) return setLook({pattern:btn.dataset.pat});
+  if (btn && btn.dataset.acc) { const lv = ACCS.find(a => a[0] === btn.dataset.acc)[2]; if (petStage() < lv) return toast(`Unlocks at level ${lv + 1} — finish ${STAGE_AT[lv]} tasks`); return setLook({acc:btn.dataset.acc}); }
+  if (btn && btn.dataset.who) { lookWho = btn.dataset.who; return renderPetCard(); }
+  if (id === 'pcLookT') { lookOpen = !lookOpen; return renderPetCard(); }
+  if (id === 'tlTreat' || id === 'tlYarn' || id === 'tlLaser') { const t = id === 'tlTreat' ? 'treat' : id === 'tlYarn' ? 'yarn' : 'laser'; if (t === 'treat' && S.pet.treats < 1) return toast('No treats left — finish a task to earn one 🐟'); closePetCard(); return setTool(t); }
   if (id === 'pcRename') { renderPetCard('pet'); $('#pcIn').focus(); $('#pcIn').select(); }
   if (id === 'pcSave') savePetName('pet');
   if (id === 'pcFrRename') { renderPetCard('friend'); $('#pcFrIn').focus(); $('#pcFrIn').select(); }
@@ -1868,11 +1944,116 @@ $('#petCard').addEventListener('keydown', e => {
 });
 $('#petCard').addEventListener('mouseenter', () => clearTimeout(petCardT)); $('#petCard').addEventListener('mouseleave', resetCardTimer);
 
+/* ---------- interaction: pick cats up, rub them, eyes follow you, toys ---------- */
+let lastPtr = {x:innerWidth / 2, y:innerHeight / 2}, eyeRaf = 0;
+function enableDrag(c){
+  let st = null;
+  c.btn.addEventListener('pointerdown', e => { if (e.button) return; st = {x:e.clientX, y:e.clientY, moved:false}; try { c.btn.setPointerCapture(e.pointerId); } catch(_){} });
+  c.btn.addEventListener('pointermove', e => {
+    if (!st) return;
+    if (!st.moved && Math.hypot(e.clientX - st.x, e.clientY - st.y) > 8) { st.moved = true; c.held = true; c.busy = true; petEvt++; c.el.classList.remove('walk', 'run', 'fall'); setPose(c, 'held'); catSpeak(c, pick(['whoa!', 'put me down!', 'eep!']), 1800); }
+    if (st.moved) { c.x = clampN(e.clientX - catW(c) / 2, 0, innerWidth - catW(c)); c.y = clampN(e.clientY - 10, 0, innerHeight - catH(c)); c.el.style.transform = `translate(${c.x}px,${c.y}px)`; c.btn.style.pointerEvents = 'auto'; }
+  });
+  const end = e => { if (!st) return; const was = st.moved; st = null; try { c.btn.releasePointerCapture(e.pointerId); } catch(_){} if (was) { c.suppressClick = true; setTimeout(() => c.suppressClick = false, 0); dropCat(c); } };
+  c.btn.addEventListener('pointerup', end); c.btn.addEventListener('pointercancel', end);
+}
+async function dropCat(c){
+  const gy = bounds(c).y1, d = Math.max(0, gy - c.y);
+  c.held = false; setPose(c, 'fall');
+  if (d > 4) { const dur = .25 + Math.sqrt(d) / 38; c.el.style.setProperty('--dur', dur + 's'); c.y = gy; c.el.style.transform = `translate(${c.x}px,${c.y}px)`; await delay(dur * 1000); }
+  c.btn.style.pointerEvents = 'auto'; setPose(c, 'happy'); heartsOn(c, 2); catSpeak(c, pick(['nailed it!', '*thud* …I meant to do that', 'whee! again?']));
+  const o = CATS.find(x => x !== c && catShown(x));
+  if (o && !o.held && Math.hypot(o.x - c.x, o.y - c.y) < catW(c) * 1.3) { setPose(o, 'happy'); heartsAt((o.x + c.x) / 2 + catW(c) / 2, c.y, 3); catSpeak(o, 'hi friend! 💕'); setTimeout(() => backToSit(o), 1600); }
+  setTimeout(() => { if (!c.held) { c.busy = false; backToSit(c); } }, 1700);
+}
+function updateEyes(){
+  eyeRaf = 0;
+  CATS.forEach(c => { if (!catShown(c) || c.pose === 'sleep') return; const r = c.btn.getBoundingClientRect(), cx = r.left + r.width * (c.dir > 0 ? .7 : .3), cy = r.top + r.height * .4, dx = lastPtr.x - cx, dy = lastPtr.y - cy, m = Math.hypot(dx, dy) || 1, k = Math.min(m / 160, 1);
+    c.el.style.setProperty('--ex', (dx / m * k * 2.2 * c.dir).toFixed(1) + 'px'); c.el.style.setProperty('--ey', (dy / m * k * 2).toFixed(1) + 'px'); });
+}
+addEventListener('pointermove', e => {
+  lastPtr = {x:e.clientX, y:e.clientY}; if (laserEl) { laserEl.style.left = e.clientX + 'px'; laserEl.style.top = e.clientY + 'px'; }
+  if (!eyeRaf) eyeRaf = requestAnimationFrame(updateEyes);
+  if (e.buttons) return;
+  CATS.forEach(c => { // rubbing a cat makes it purr
+    if (!catShown(c) || c.held || c.busy) return; const r = c.btn.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) { c.rub = 0; return; }
+    c.rub = (c.rub || 0) + Math.hypot(e.movementX || 0, e.movementY || 0);
+    if (c.rub > 240 && Date.now() - (c.lastPurr || 0) > 2200) { c.rub = 0; c.lastPurr = Date.now(); if (!c.friend) { S.pet.love = Math.min(100, S.pet.love + 1); save(); } setPose(c, 'happy'); heartsOn(c, 1); catSpeak(c, pick(['prrrr…', '*purr purr*', 'mmm yes, there']), 1800); setTimeout(() => backToSit(c), 1400); }
+  });
+}, {passive:true});
+
+const YARN = '<svg viewBox="0 0 30 30" fill="none" stroke="#2B2019" stroke-width="1.6" stroke-linecap="round"><circle cx="15" cy="15" r="12" fill="var(--yellow)"/><path d="M5 11q10 6 20 0M4 17q11 7 22 0M9 5q8 12 0 20"/><path d="M26 20q4 3 1 7" stroke="var(--red)"/></svg>';
+let tool = null, toolT = 0, laserEl = null, laserT = 0;
+function setTool(t){
+  if (tool === 'laser' && t !== 'laser') endLaser();
+  tool = t; clearTimeout(toolT);
+  if (t) document.body.dataset.tool = t; else delete document.body.dataset.tool;
+  if (t === 'laser') startLaser();
+  else if (t) { catSpeak(CATS[0], t === 'yarn' ? 'click anywhere to throw the yarn 🧶' : 'click where the treat should land 🐟', 5000); toolT = setTimeout(() => setTool(null), 20000); }
+}
+document.addEventListener('click', e => {
+  if (!tool) return;
+  if (e.target.closest('#petCard, #dlg')) return;
+  e.preventDefault(); e.stopPropagation();
+  if (tool === 'laser') return endLaser();
+  const k = tool; setTool(null); dropToy(k, e.clientX, e.clientY);
+}, true);
+function moveTo(c, x, y, speed){ // like walkTo but does not wait (used for chasing a moving target)
+  if (c.held) return; const b = bounds(c); x = clampN(x, b.x0, b.x1); y = clampN(y, b.y0, b.y1);
+  const dx = x - c.x, dist = Math.hypot(dx, y - c.y); if (dist < 3) return;
+  if (Math.abs(dx) > 6) { c.dir = dx > 0 ? 1 : -1; c.btn.style.setProperty('--dir', c.dir); }
+  c.el.style.setProperty('--dur', Math.max(.15, dist / speed) + 's'); if (c.pose !== 'run') setPose(c, 'run');
+  c.x = x; c.y = y; c.el.style.transform = `translate(${x}px,${y}px)`; c.btn.style.pointerEvents = groundish(c) ? 'auto' : 'none';
+}
+function startLaser(){
+  const cats = CATS.filter(catShown); if (!cats.length) { tool = null; delete document.body.dataset.tool; return; }
+  laserEl = document.createElement('div'); laserEl.id = 'laser'; laserEl.style.left = lastPtr.x + 'px'; laserEl.style.top = lastPtr.y + 'px'; document.body.appendChild(laserEl);
+  petEvt++; cats.forEach(c => { c.busy = true; }); catSpeak(cats[0], 'ooh, a red dot!', 3000);
+  const t0 = Date.now();
+  laserT = setInterval(() => {
+    if (Date.now() - t0 > 12000) return setTool(null);
+    cats.forEach((c, i) => { const tx = lastPtr.x - catW(c) / 2 + (i ? 46 : -30), ty = lastPtr.y - catH(c) * .7;
+      if (Math.hypot(tx - c.x, ty - c.y) > 60) moveTo(c, tx, ty, 200); else if (c.pose !== 'play' && !c.held) setPose(c, 'play'); });
+  }, 220);
+}
+function endLaser(){
+  clearInterval(laserT); laserEl && laserEl.remove(); laserEl = null; tool = null; delete document.body.dataset.tool;
+  const cats = CATS.filter(catShown); S.pet.love = Math.min(100, S.pet.love + 5); save();
+  cats.forEach(c => { c.busy = false; setPose(c, 'happy'); heartsOn(c, 2); setTimeout(() => backToSit(c), 1800); }); if (cats[0]) catSpeak(cats[0], 'got it!! 😼');
+}
+async function dropToy(kind, x, y){
+  const cats = CATS.filter(c => catShown(c) && !c.held); if (!cats.length) return;
+  if (kind === 'treat') { if (S.pet.treats < 1) return toast('No treats left — finish a task to earn one 🐟'); S.pet.treats--; save(); }
+  petEvt++; cats.forEach(c => { c.busy = true; });
+  const el = document.createElement('div'); el.className = 'toy ' + kind; el.innerHTML = kind === 'treat' ? '🐟' : YARN;
+  el.style.left = x - 14 + 'px'; el.style.top = y - 14 + 'px'; document.body.appendChild(el);
+  await delay(30); el.style.top = innerHeight - 34 + 'px'; await delay(600); // it falls to the floor
+  let ix = x;
+  const go = async (c, speed) => { const dir = c.x + catW(c) / 2 < ix ? 1 : -1, tx = dir === 1 ? ix - catW(c) * .85 : ix - catW(c) * .15; await walkTo(c, tx, bounds(c).y1, speed); c.dir = dir; };
+  try {
+    const order = [...cats].sort((a, b) => Math.abs(a.x - ix) - Math.abs(b.x - ix));
+    if (kind === 'treat') {
+      const [first, ...rest] = order; rest.forEach(o => { catSpeak(o, 'hey, share! 🥺'); go(o, 70); });
+      await go(first, 120); el.remove(); setPose(first, 'eat'); heartsOn(first, 3); catSpeak(first, pick(['nom nom nom', 'yum! 🐟', '*crunch*']));
+      S.pet.love = Math.min(100, S.pet.love + 8); save(); await delay(3600);
+    } else {
+      await Promise.all(order.map(c => go(c, 130))); order.forEach(c => setPose(c, 'play')); catSpeak(order[0], pick(['got it!', 'pounce!', '*bat bat*'])); await delay(2800);
+      ix = clampN(ix + (ix > innerWidth / 2 ? -150 : 150), 40, innerWidth - 60); el.classList.add('roll'); el.style.left = ix - 14 + 'px'; await delay(150);
+      await Promise.all(order.map(c => go(c, 150))); order.forEach(c => setPose(c, 'play')); heartsOn(order[0], 3); await delay(2600);
+      S.pet.love = Math.min(100, S.pet.love + 6); save();
+    }
+  } finally {
+    el.remove(); cats.forEach(c => { if (!c.held) { c.busy = false; setPose(c, 'sit'); } });
+  }
+}
+
 /* on / off */
 function applyPet(entrance){
   const on = S.pet.on, f = CATS[1];
   petEvt++; clearTimeout(petEvtT);
-  CATS.forEach(c => { c.busy = false; clearTimeout(c.loop); c.el.hidden = !catShown(c); });
+  if (tool) setTool(null);
+  CATS.forEach(c => { c.busy = false; c.held = false; clearTimeout(c.loop); c.el.hidden = !catShown(c); });
   $('#petToggle').classList.toggle('on', on); $('#petToggle').title = on ? 'Hide your cat' : 'Show your cat';
   $('#petToggle2').textContent = on ? '🐾 Hide cat' : '🐾 Show cat';
   if (!on) return;
@@ -1943,6 +2124,8 @@ function fixupRemote(){
   S.music = S.music || {tracks:[], idx:0};
   S.pet = Object.assign({on:true, name:'', love:30, treats:0, done:0, seeded:true, asked:true}, S.pet || {});
   S.pet.friend = Object.assign({on:true, name:'Pudding', seen:true}, S.pet.friend || {});
+  S.pet.look = Object.assign({fur:'auto', pattern:'plain', acc:'none'}, S.pet.look || {});
+  S.pet.friend.look = Object.assign({fur:'#E8914F', pattern:'stripes', acc:'none'}, S.pet.friend.look || {});
   S.pomoSet = Object.assign({on:false, f:25, b:5, l:15, every:4}, S.pomoSet || {});
   if (S.timer && !projOf(S.timer.pid)) S.timer = null;
   if (S.brand !== '+' && !S.brands.some(b => b.id === S.brand)) S.brand = S.brands[0]?.id || '+';
